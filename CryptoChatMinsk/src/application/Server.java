@@ -388,7 +388,7 @@ ss.close();
 * @throws IOException 
 */ 
 public static void main(String[] args) throws IOException { 
-new Server(45000).run(); // если сервер не создался, программа 
+new Server(45536).run(); // если сервер не создался, программа 
 // вылетит по эксепшену, и метод run() не запуститься 
 } 
 
