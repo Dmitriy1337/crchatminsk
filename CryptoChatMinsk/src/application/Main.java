@@ -51,9 +51,11 @@ public class Main extends Application {
 	Scene sc3;
 	AnchorPane ap4;
 	Scene sc4;
+	Label lname;
 	int id =1;
 	int id1  =0;
 	int id2  =0;
+	Button chooseu;
 	ImageView accinfo;
 	String log;
 	boolean isTrue;
@@ -65,6 +67,8 @@ public class Main extends Application {
 	ResultSet rs2 =null;
 	PreparedStatement stat1 = null;
 	PreparedStatement stat2 = null;
+	Label sname;
+	Label slogin;
 	Label iname;
 	Label ipass;
 	Label ilogin;
@@ -97,8 +101,8 @@ public class Main extends Application {
                       
 						while(rs1.next()){ 
 							if(rs1.getString(3).equals(log)){
-								id1 = rs1.getInt(1);
-								String onl ="UPDATE table2 SET Online = '0' WHERE ID = '"+id1+"'";
+								//id1 = rs1.getInt(1);
+								String onl ="UPDATE table2 SET Online = '0' WHERE Login = '"+log+"'";
 								stat4.executeUpdate(onl);
 							 try {
 								readdb();
@@ -174,19 +178,23 @@ public class Main extends Application {
 						stat3 = conn.createStatement();
 						rs1= stat3.executeQuery("Select * from table2");
 						stat4 = conn.createStatement();
-						System.out.println(rs1.next());
-					elog=elogin.getText();
-						if(rs1.next()==false){
-							ewarning.setOpacity(1);
-							mStage.show();	
-						}
-						while(rs1.next()){ 
+						//System.out.println("tf "+rs1.ne.next());
+				//	elog=elogin.getText();
+						//if(rs1.next()==false){
+						//	ewarning.setOpacity(1);
+						//	mStage.show();	
+						
+					//	}
+						//else{
+							//System.out.println("tf2 "+rs1.next());
+							while(rs1.next()){ 
+							System.out.println(rs1.getString(4)+"/"+password.getText());
 							if(rs1.getString(4).equals(password.getText())&&rs1.getString(3).equals(login.getText())){
 								System.out.println("enter");
 								regg = 1; 
 								log = login.getText();
-								id2=rs1.getInt(1);
-								String onl1 ="UPDATE table2 SET Online = '1' WHERE ID = '"+id2+"'";
+							//	id2=rs1.getInt(1);
+								String onl1 ="UPDATE table2 SET Online = '1' WHERE Login = '"+log+"'";
 								stat4.executeUpdate(onl1);
 								 try {
 										readdb();
@@ -194,7 +202,9 @@ public class Main extends Application {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
-	                            mStage.setScene(sc2);
+								 Thread tc = new TurnServer(); 
+						            tc.start();
+								 mStage.setScene(sc2);
 								mStage.show();
 							 }
 							else {//if((!rs1.getString(4).equals(password.getText()))||(!rs1.getString(3).equals(login.getText()))){
@@ -205,7 +215,7 @@ public class Main extends Application {
 								System.out.println("Write legal password or login");
 							}
 						
-						}
+						}//}
 						System.out.println(regg);
 						//System.out.println(regg);
 			} catch (SQLException e) {
@@ -391,8 +401,17 @@ public class Main extends Application {
 			try {
 				while(rs1.next()){ 
 					if(rs1.getString(3).equals(search.getText())&&!rs1.getString(3).equals(elog)){ 
-					
-						
+						chooseu.setDisable(false);
+						chooseu.setOnAction(ac->{
+							lname.setText(sname.getText());
+							lname.setOpacity(1);
+						mStage.show();
+						});
+						sname.setText(rs1.getString(2));
+						sname.setOpacity(1);
+						slogin.setText(rs1.getString(3));
+						slogin.setOpacity(1);
+						sres.setOpacity(1);
 						System.out.println(search.getText());	
 					
 					}}
@@ -459,9 +478,45 @@ public class Main extends Application {
 	
 	sres = new ImageView("img/sres.png");
 	sres.setLayoutX(5);
-	sres.setLayoutY(110);
+	sres.setLayoutY(150);
 	sres.setFitHeight(75);
 	sres.setFitWidth(177);
+	sres.setOpacity(0);
+	ap2.getChildren().add(sres);
+	
+	sname = new Label("name");
+	sname.setLayoutX(15);
+	sname.setLayoutY(150);
+	sname.setFont(new Font("Rockwell Condensed",30));
+	sname.setStyle(" -fx-text-fill: #ffffff;-fx-text-stroke-width: 4px;-fx-text-stroke-color: black;");
+	sname.setOpacity(0);
+	ap2.getChildren().add(sname);
+	
+	slogin = new Label("name");
+	slogin.setLayoutX(15);
+	slogin.setLayoutY(180);
+	slogin.setFont(new Font("Rockwell Condensed",30));
+	slogin.setStyle(" -fx-text-fill: #ffffff;-fx-text-stroke-width: 4px;-fx-text-stroke-color: black;");
+	slogin.setOpacity(0);
+	ap2.getChildren().add(slogin);
+	
+	
+	chooseu = new Button();
+	chooseu.setLayoutX(155);
+	chooseu.setLayoutY(153);
+	chooseu.setPrefHeight(68);
+	chooseu.setPrefWidth(25);
+	chooseu.setOpacity(0);
+	chooseu.setDisable(true);
+	ap2.getChildren().add(chooseu);
+	
+	lname = new Label("Name");
+	lname.setLayoutX(210);
+	lname.setLayoutY(75);
+	lname.setOpacity(0);
+	//lname.setStyle(" -fx-text-fill: #ffffff;-fx-text-stroke-width: 4px;-fx-text-stroke-color: black;");
+	lname.setFont(new Font("Rockwell Condensed",45));
+	ap2.getChildren().add(lname);
 	}
 	public void signUpGUI(){
 		ImageView reg= new ImageView("img/registration.png");
@@ -515,7 +570,7 @@ public class Main extends Application {
 	
 	while(rs.next()){ 
 		System.out.println("://");
-		System.out.println(rs.getString(1)+"//"+rs.getString(2)+"//"+rs.getString(3)+"// "+rs.getString(4)+"// "+rs.getString(5)+"// "+rs.getString(6)); 
+		System.out.println(rs.getInt(1)+"//"+rs.getString(2)+"//"+rs.getString(3)+"// "+rs.getString(4)+"// "+rs.getString(5)+"// "+rs.getString(6)); 
 	// rs.getInt(1) auaia 1 eieiiee ec AA a eiinieu e.o.a 
 	
 	} 
@@ -552,15 +607,15 @@ public class Main extends Application {
 		} 
 		
 			stat1 = conn.prepareStatement("INSERT INTO table2" 
-				+ " (ID,Name, Login, Password,IP,Online) values (?,?,?,?,?,?)");
+				+ " (Name, Login, Password,IP,Online) values (?,?,?,?,?)");
 		//stat1.setInt(1, 5 ); 
 		System.out.println(login.getText()+"/"+password.getText());
-		stat1.setInt(1,id);
-		stat1.setString(2,ename.getText());
-		stat1.setString(3,elogin.getText()); 
-		stat1.setString(4,epassword.getText()); 
-		stat1.setString(5,"2");
-		stat1.setString(6,"0");
+		//stat1.setInt(1,id);
+		stat1.setString(1,ename.getText());
+		stat1.setString(2,elogin.getText()); 
+		stat1.setString(3,epassword.getText()); 
+		stat1.setString(4,"2");
+		stat1.setString(5,"0");
 		stat1.executeUpdate(); 
 		stat1.close(); 
 		id++;
@@ -571,5 +626,17 @@ public class Main extends Application {
 			e.printStackTrace();
 		}
 	}
+	public class TurnServer extends Thread{
+	     
 
+		  public void run() {
+		   try {
+		    new Server(45536).run();
+		   } catch (IOException e) {
+		    // TODO Auto-generated catch block
+		    e.printStackTrace();
+		   }
+		  }
+		  
+		 }
 }

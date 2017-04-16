@@ -18,7 +18,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 * Класс сервера. Сидит тихо на порту, принимает сообщение, создает SocketProcessor на каждое сообщение 
 */ 
 public class Server { 
-boolean sr = false; 
+	 private int smesh = (int)'a';//смещение алфавита относительно таблицы юникодов
+	 private int usmesh = (int)'A';
+	 boolean sr = false; 
 BufferedReader UL; 
 Socket s; 
 private ServerSocket ss; // сам сервер-сокет 
@@ -192,6 +194,29 @@ s = ss.accept();
 return s; 
 } 
 
+public String encrypt(String text, String keyWord)
+{
+    StringBuilder ans = new StringBuilder();
+    for(int i = 0; i < text.length();i++)
+    {
+        int num = ((text.charAt(i) + keyWord.charAt(i % keyWord.length()) - 2 * smesh) % 26);
+        //в num лежит номер буквы в алфавите
+        char c;
+        System.out.print(text.charAt(i)+"/"+num+"//");
+
+        if(text.charAt(i)>96){
+    	  c = (char)(num + smesh);
+      }
+      else{
+    	   c = (char)(num + usmesh);
+      } 
+        ans.append(c);
+    }
+    return ans.toString();
+}
+
+
+
 String shifr(String userString){ 
 
 kascii = new int[res.length()]; 
@@ -357,7 +382,7 @@ if(shmessage>122){
 shmessage = shmessage-71;//%121+96; 
 } 
 
-System.out.println(shmessage); 
+System.out.println("message"+shmessage); 
 
 decode = decode + (char)( shmessage); // 
 
@@ -425,7 +450,7 @@ if(sr==true){
 String line = null; 
 try { 
 line = br.readLine(); // пробуем прочесть. 
-System.out.println(line); 
+System.out.println(decrypt(line,res)); 
 
 } catch (IOException e) { 
 close(); // если не получилось 
@@ -462,7 +487,7 @@ public synchronized void send( String us2) {
 try { 
 
 Usersline = UL.readLine(); 
-us2 = shifr(Usersline); 
+us2 = encrypt(Usersline,res); 
 mch = "";
 bw.write(us2); // пишем строку 
 bw.write("\n"); // пишем перевод строки 
@@ -473,4 +498,26 @@ close(); //если глюк в момент отправки - закрываем данный сокет.
 } 
 
 } 
+
+public String decrypt(String shifr, String keyWord)
+{
+    StringBuilder ans = new StringBuilder();
+    for(int i = 0; i < shifr.length();i++)
+    {
+        int num = ((shifr.charAt(i)  - keyWord.charAt(i % keyWord.length()) + 26) % 26);
+        //обратные преобразования с номером буквы в алфавите
+        char c;
+        System.out.print(shifr.charAt(i)+"/"+num+"//");
+
+        if(shifr.charAt(i)>96){
+    	  c = (char)(num + smesh);
+      }
+      else{
+    	   c = (char)(num + usmesh);
+      } 
+        ans.append(c);
+    }
+    return ans.toString();
+}
+
 }

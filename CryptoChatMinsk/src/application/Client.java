@@ -35,6 +35,8 @@ int j;
 String userString= ""; 
 String mch =""; 
 String userLine; 
+private int usmesh = (int)'A';//смещение алфавита относительно таблицы юникодов
+private int smesh = (int)'a';//смещение алфавита относительно таблицы юникодов
 /** 
 * Конструктор объекта клиента 
 * @param host - IP адрес или localhost или доменное имя 
@@ -157,6 +159,30 @@ e.printStackTrace();
 
 } 
 
+
+public String encrypt(String text, String keyWord)
+{
+    StringBuilder ans = new StringBuilder();
+    for(int i = 0; i < text.length();i++)
+    {
+        int num = ((text.charAt(i) + keyWord.charAt(i % keyWord.length()) - 2 * smesh) % 26);
+        //в num лежит номер буквы в алфавите
+     char c;
+     System.out.print(text.charAt(i)+"/"+num+"//");
+
+     if(text.charAt(i)>96){
+    	  c = (char)(num + smesh);
+      }
+      else{
+    	   c = (char)(num + usmesh);
+      } 
+//      char c = (char)(num + smesh);//получаем нужный символ
+        ans.append(c);
+    }
+    return ans.toString();
+}
+
+
 String shifr( String userString ){ 
 
 kascii = new int[res.length()]; 
@@ -261,7 +287,7 @@ String userString = null;
 String us1 = null; 
 try { 
 userString = userInput.readLine(); // читаем строку от пользователя 
-us1 = shifr(userString); 
+us1 = encrypt(userString,res); 
 mch = "";
 } catch (IOException ignored) {} // с консоли эксепшена не может быть в принципе, игнорируем 
 //если что-то не так или пользователь просто нажал Enter... 
@@ -327,12 +353,32 @@ System.out.println("Server has closed connection");
 close(); // ...закрываемся 
 } 
 else { // иначе печатаем то, что прислал сервер. 
-System.out.println("Server:" + line); 
+System.out.println("Server:" + decrypt(line,res)); 
 } 
 } 
 } 
 } 
 } 
 
-
+public String decrypt(String shifr, String keyWord)
+{
+    StringBuilder ans = new StringBuilder();
+    for(int i = 0; i < shifr.length();i++)
+    {
+        int num = ((shifr.charAt(i)  - keyWord.charAt(i % keyWord.length()) + 26) % 26);
+        //обратные преобразования с номером буквы в алфавите
+        char c;
+       
+        System.out.print(shifr.charAt(i)+"/"+num+"//");
+        if(shifr.charAt(i)>96){
+         c = (char)(num + smesh);
+       }
+       else{
+    	   c = (char)(num + usmesh);   
+    	   
+       }
+        ans.append(c);
+    }
+    return ans.toString();
+}
 }
