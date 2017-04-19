@@ -162,24 +162,58 @@ e.printStackTrace();
 
 public String encrypt(String text, String keyWord)
 {
-    StringBuilder ans = new StringBuilder();
-    for(int i = 0; i < text.length();i++)
+  
+	StringBuilder ans = new StringBuilder();
+	String letters = "";
+	for(int i = 0;i<text.length();i++){
+	   
+	   if(text.charAt(i)<96){
+		   letters = letters+1;
+		    
+	   }
+	   else{
+		   letters = letters+0;   
+	   }
+   }
+  text.toLowerCase();
+   for(int i = 0; i < text.length();i++)
     {
-        int num = ((text.charAt(i) + keyWord.charAt(i % keyWord.length()) - 2 * smesh) % 26);
+       
         //в num лежит номер буквы в алфавите
      char c;
-     System.out.print(text.charAt(i)+"/"+num+"//");
-
-     if(text.charAt(i)>96){
-    	  c = (char)(num + smesh);
-      }
-      else{
-    	   c = (char)(num + usmesh);
-      } 
+    
+     int num = ((text.charAt(i) + keyWord.charAt(i % keyWord.length()) - 2 * smesh) % 26);
+   
+    	
+    	 c = (char)(num + smesh);
+      
+     
 //      char c = (char)(num + smesh);//получаем нужный символ
         ans.append(c);
     }
-    return ans.toString();
+  String result = "";
+ String a = "";
+ char b; 
+ for(int i = 0;i<ans.toString().length();i++){
+	if(letters.charAt(i)==49){
+	//System.out.println("ssss");
+	a+=ans.toString().charAt(i);
+	a.toUpperCase();
+	b = a.charAt(0);
+	result+=b;
+	a="";
+	
+	}   
+	else{
+		result+=ans.toString().charAt(i);
+		
+		
+	}  
+ }
+System.out.println("res"+result);
+System.out.println("decr"+decrypt(result,res));
+return result;
+
 }
 
 
@@ -282,6 +316,16 @@ return mch;
 public void run() { 
 df(); 
 System.out.println("Type phrase(s) (hit Enter to exit):"); 
+String mess = "User has been connected";
+//try {
+	//socketWriter.write(encrypt(mess,res)); //пишем строку пользователя 
+	//socketWriter.write("\n");
+	//socketWriter.flush(); // отправляем 
+//} catch (IOException e1) {
+	//// TODO Auto-generated catch block
+//	e1.printStackTrace();
+//} //добавляем "новою строку", дабы readLine() сервера сработал 
+
 while (true) { 
 String userString = null; 
 String us1 = null; 
@@ -354,6 +398,7 @@ close(); // ...закрываемся
 } 
 else { // иначе печатаем то, что прислал сервер. 
 System.out.println("Server:" + decrypt(line,res)); 
+
 } 
 } 
 } 
@@ -363,22 +408,54 @@ System.out.println("Server:" + decrypt(line,res));
 public String decrypt(String shifr, String keyWord)
 {
     StringBuilder ans = new StringBuilder();
-    for(int i = 0; i < shifr.length();i++)
+    String letters = "";
+	for(int i = 0;i<shifr.length();i++){
+	   
+	   if(shifr.charAt(i)<96){
+		   letters = letters+1;
+		    
+	   }
+	   else{
+		   letters = letters+0;   
+	   }
+   }
+
+  shifr =  shifr.toLowerCase();
+	System.out.println("shifr LC "+shifr+"//"+letters);
+   for(int i = 0; i < shifr.length();i++)
     {
         int num = ((shifr.charAt(i)  - keyWord.charAt(i % keyWord.length()) + 26) % 26);
         //обратные преобразования с номером буквы в алфавите
         char c;
        
-        System.out.print(shifr.charAt(i)+"/"+num+"//");
-        if(shifr.charAt(i)>96){
+       // System.out.print(shifr.charAt(i)+"/"+num+"//");
+       
          c = (char)(num + smesh);
-       }
-       else{
-    	   c = (char)(num + usmesh);   
-    	   
-       }
+      
+    	
         ans.append(c);
+       
     }
-    return ans.toString();
-}
+    String result = "";
+    String a = "";
+    char b; 
+    for(int j = 0;j<ans.toString().length();j++){
+   	if(letters.charAt(j)==49){
+   	System.out.println("s");
+   	a+=ans.toString().charAt(j);
+   	a = a.toUpperCase();
+   	b = a.charAt(0);
+   	result+=b;
+   	a="";
+   	
+   	}   
+   	else{
+   		result+=ans.toString().charAt(j);
+   		
+   		
+   	}  
+    }
+   System.out.println("res"+result);
+    return result;
+}//
 }

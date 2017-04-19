@@ -196,23 +196,58 @@ return s;
 
 public String encrypt(String text, String keyWord)
 {
-    StringBuilder ans = new StringBuilder();
-    for(int i = 0; i < text.length();i++)
-    {
-        int num = ((text.charAt(i) + keyWord.charAt(i % keyWord.length()) - 2 * smesh) % 26);
-        //в num лежит номер буквы в алфавите
-        char c;
-        System.out.print(text.charAt(i)+"/"+num+"//");
+	  
+		StringBuilder ans = new StringBuilder();
+		String letters = "";
+		for(int i = 0;i<text.length();i++){
+		   
+		   if(text.charAt(i)<96){
+			   letters = letters+1;
+			    
+		   }
+		   else{
+			   letters = letters+0;   
+		   }
+	   }
+	  text.toLowerCase();
+	   for(int i = 0; i < text.length();i++)
+	    {
+	       
+	        //в num лежит номер буквы в алфавите
+	     char c;
+	    
+	     int num = ((text.charAt(i) + keyWord.charAt(i % keyWord.length()) - 2 * smesh) % 26);
+	   
+	    	
+	    	 c = (char)(num + smesh);
+	      
+	     
+//	      char c = (char)(num + smesh);//получаем нужный символ
+	        ans.append(c);
+	    }
+	  String result = "";
+	 String a = "";
+	 char b; 
+	 for(int i = 0;i<ans.toString().length();i++){
+		if(letters.charAt(i)==49){
+		//System.out.println("ssss");
+		a+=ans.toString().charAt(i);
+		a.toUpperCase();
+		b = a.charAt(0);
+		result+=b;
+		a="";
+		
+		}   
+		else{
+			result+=ans.toString().charAt(i);
+			
+			
+		}  
+	 }
+	System.out.println("res"+result);
+	System.out.println("decr"+decrypt(result,res));
+	return result;
 
-        if(text.charAt(i)>96){
-    	  c = (char)(num + smesh);
-      }
-      else{
-    	   c = (char)(num + usmesh);
-      } 
-        ans.append(c);
-    }
-    return ans.toString();
 }
 
 
@@ -444,10 +479,11 @@ UL = new BufferedReader(new InputStreamReader(System.in));
 * Главный цикл чтения сообщений/рассылки 
 */ 
 public void run() { 
-
+Thread t1 = new Thread(new writeToClient());
+t1.start();
 while (!s.isClosed()) { // пока сокет не закрыт... 
 if(sr==true){ 
-String line = null; 
+String line = "1"; 
 try { 
 line = br.readLine(); // пробуем прочесть. 
 System.out.println(decrypt(line,res)); 
@@ -457,24 +493,53 @@ close(); // если не получилось
 //- закрываем сокет. 
 } 
 
-if (line == null) { // если строка null - клиент отключился в штатном режиме. 
-close(); // то закрываем сокет 
-} else if ("shutdown".equals(line)) { // если поступила команда "погасить сервер", то... 
-serverThread.interrupt(); // сначала возводим флаг у северной нити о необходимости прерваться. 
-try { 
-new Socket("localhost", port); // создаем фейк-коннект (чтобы выйти из .accept()) 
-} catch (IOException ignored) { //ошибки неинтересны 
-} finally { 
-shutdownServer(); // а затем глушим сервер вызовом его метода shutdownServer(). 
+//if (line == null) { // если строка null - клиент отключился в штатном режиме. 
+//close(); // то закрываем сокет 
+//} else if ("shutdown".equals(line)) { // если поступила команда "погасить сервер", то... 
+//serverThread.interrupt(); // сначала возводим флаг у северной нити о необходимости прерваться. 
+//try { 
+//new Socket("localhost", port); // создаем фейк-коннект (чтобы выйти из .accept()) 
+//} catch (IOException ignored) { //ошибки неинтересны 
+//} finally { 
+//shutdownServer(); // а затем глушим сервер вызовом его метода shutdownServer(). 
+//} 
+//} else { // иначе - банальная рассылка по списку сокет-процессоров 
+//for (SocketProcessor sp:q) { 
+//sp.send(us2); 
+//} 
+//} 
 } 
-} else { // иначе - банальная рассылка по списку сокет-процессоров 
-for (SocketProcessor sp:q) { 
-sp.send(us2); 
 } 
 } 
-} 
-} 
-} 
+
+
+public class writeToClient implements Runnable{
+
+	@Override
+	public void run() {
+		while(true){
+			try { 
+
+				Usersline = UL.readLine(); 
+				us2 = encrypt(Usersline,res); 
+				mch = "";
+				bw.write(us2); // пишем строку 
+				bw.write("\n"); // пишем перевод строки 
+				bw.flush(); // отправляем 
+				} catch (IOException e) { 
+				close(); //если глюк в момент отправки - закрываем данный сокет. 
+				} 
+			
+			
+			
+		}
+		
+	}
+	
+}
+
+
+
 public synchronized void close() { 
 q.remove(this); //убираем из списка 
 if (!s.isClosed()) { 
@@ -500,24 +565,55 @@ close(); //если глюк в момент отправки - закрываем данный сокет.
 } 
 
 public String decrypt(String shifr, String keyWord)
-{
-    StringBuilder ans = new StringBuilder();
-    for(int i = 0; i < shifr.length();i++)
-    {
-        int num = ((shifr.charAt(i)  - keyWord.charAt(i % keyWord.length()) + 26) % 26);
-        //обратные преобразования с номером буквы в алфавите
-        char c;
-        System.out.print(shifr.charAt(i)+"/"+num+"//");
-
-        if(shifr.charAt(i)>96){
-    	  c = (char)(num + smesh);
-      }
-      else{
-    	   c = (char)(num + usmesh);
-      } 
-        ans.append(c);
-    }
-    return ans.toString();
+{ StringBuilder ans = new StringBuilder();
+String letters = "";
+for(int i = 0;i<shifr.length();i++){
+   
+   if(shifr.charAt(i)<96){
+	   letters = letters+1;
+	    
+   }
+   else{
+	   letters = letters+0;   
+   }
 }
+
+shifr =  shifr.toLowerCase();
+System.out.println("shifr LC "+shifr+"//"+letters);
+for(int i = 0; i < shifr.length();i++)
+{
+    int num = ((shifr.charAt(i)  - keyWord.charAt(i % keyWord.length()) + 26) % 26);
+    //обратные преобразования с номером буквы в алфавите
+    char c;
+   
+   // System.out.print(shifr.charAt(i)+"/"+num+"//");
+   
+     c = (char)(num + smesh);
+  
+	
+    ans.append(c);
+   
+}
+String result = "";
+String a = "";
+char b; 
+for(int j = 0;j<ans.toString().length();j++){
+	if(letters.charAt(j)==49){
+	System.out.println("s");
+	a+=ans.toString().charAt(j);
+	a = a.toUpperCase();
+	b = a.charAt(0);
+	result+=b;
+	a="";
+	
+	}   
+	else{
+		result+=ans.toString().charAt(j);
+		
+		
+	}  
+}
+System.out.println("res"+result);
+return result;}
 
 }
