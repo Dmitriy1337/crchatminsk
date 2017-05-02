@@ -1,7 +1,9 @@
 package application;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.*;
-
+import java.util.ArrayList;
 
 import com.mysql.jdbc.Driver;
 
@@ -25,9 +27,11 @@ import javafx.scene.text.Font;
 
 
 public class Main extends Application {
+	
 	public static Connection conn;
 	public static Statement statmt;
 	public static ResultSet resSet;
+	InetAddress	ip1;
 	TextField login;
 	PasswordField password;
 	TextField ename;
@@ -41,7 +45,7 @@ public class Main extends Application {
 	ImageView sres;
 	PasswordField eapassword;
 	int regg = 0;
-	String elog;
+	public static String elog;
 	AnchorPane ap1;
 	AnchorPane ap2;
 	AnchorPane ap3;
@@ -51,11 +55,10 @@ public class Main extends Application {
 	Scene sc3;
 	AnchorPane ap4;
 	Scene sc4;
-	Label lname;
-	int id =1;
+	boolean a=false;
+	int id = 1;
 	int id1  =0;
 	int id2  =0;
-	Button chooseu;
 	ImageView accinfo;
 	String log;
 	boolean isTrue;
@@ -67,12 +70,11 @@ public class Main extends Application {
 	ResultSet rs2 =null;
 	PreparedStatement stat1 = null;
 	PreparedStatement stat2 = null;
-	Label sname;
-	Label slogin;
 	Label iname;
 	Label ipass;
+	Label ipAd;
 	Label ilogin;
-	
+
 	public void start(Stage mStage) {
 		
 		 ap1 = new AnchorPane();
@@ -85,14 +87,14 @@ public class Main extends Application {
 		 sc4= new Scene(ap4,700,500);
 		signInGUI();
 		signUpGUI();
-		mainGUI();
+		//mainGUI();
 		
-
+     
 		mStage.setOnCloseRequest(cr->{
 			try {
 				DriverManager.registerDriver(new Driver());
 				 conn = DriverManager.getConnection( 
-						"jdbc:mysql://localhost/mydb?useSSL=false", "root","12345"); 
+						"jdbc:mysql://127.0.0.1/mydb?useSSL=false", "root","12345"); 
 						System.out.println("connected");
 						stat3 = conn.createStatement();
 						rs1= stat3.executeQuery("Select * from table2");
@@ -100,13 +102,13 @@ public class Main extends Application {
                      
                       
 						while(rs1.next()){ 
-							if(rs1.getString(3).equals(log)){
-								//id1 = rs1.getInt(1);
-								String onl ="UPDATE table2 SET Online = '0' WHERE Login = '"+log+"'";
+							if(rs1.getString(2).equals(log)){
+							String onl ="UPDATE table2 SET Online = '0' WHERE Login = '"+log+"'";
 								stat4.executeUpdate(onl);
 							 try {
 								readdb();
-							} catch (Exception e) {
+							
+							 } catch (Exception e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
@@ -118,7 +120,7 @@ public class Main extends Application {
 						}
 						
 						//System.out.println(regg);
-			delete();
+			//delete();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -173,41 +175,49 @@ public class Main extends Application {
 			try {
 				DriverManager.registerDriver(new Driver());
 				 conn = DriverManager.getConnection( 
-						"jdbc:mysql://localhost/mydb?useSSL=false", "root","12345"); 
-						System.out.println("connected");
-						stat3 = conn.createStatement();
+						"jdbc:mysql://127.0.0.1/mydb?useSSL=false", "root","12345"); 
+						
+				 System.out.println("connected");
+						
+				 stat3 = conn.createStatement();
 						rs1= stat3.executeQuery("Select * from table2");
 						stat4 = conn.createStatement();
-						//System.out.println("tf "+rs1.ne.next());
-				//	elog=elogin.getText();
+						//System.out.println(rs1.next());
+					elog=elogin.getText();
 						//if(rs1.next()==false){
 						//	ewarning.setOpacity(1);
-						//	mStage.show();	
-						
-					//	}
-						//else{
-							//System.out.println("tf2 "+rs1.next());
-							while(rs1.next()){ 
-							System.out.println(rs1.getString(4)+"/"+password.getText());
-							if(rs1.getString(4).equals(password.getText())&&rs1.getString(3).equals(login.getText())){
+							//mStage.show();	
+						//}
+						while(rs1.next()){ 
+							if((rs1.getString(4).equals(password.getText()))&&(rs1.getString(3).equals(login.getText()))){
 								System.out.println("enter");
 								regg = 1; 
 								log = login.getText();
-							//	id2=rs1.getInt(1);
+								a=true;
 								String onl1 ="UPDATE table2 SET Online = '1' WHERE Login = '"+log+"'";
 								stat4.executeUpdate(onl1);
 								 try {
 										readdb();
-									} catch (Exception e) {
+									
+								 } catch (Exception e) {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
-								 Thread tc = new TurnServer(); 
-						            tc.start();
-								 mStage.setScene(sc2);
-								mStage.show();
+								 
+								 try {
+									 Server sv = new Server();
+									sv.start(Server.classStage);
+								
+									mStage.close();
+								 } catch (Exception e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								
+								
+								 
 							 }
-							else {//if((!rs1.getString(4).equals(password.getText()))||(!rs1.getString(3).equals(login.getText()))){
+							else if(!a){//if((!rs1.getString(4).equals(password.getText()))||(!rs1.getString(3).equals(login.getText()))){
 								ewarning.setOpacity(1);
 								mStage.show();
 								
@@ -215,7 +225,7 @@ public class Main extends Application {
 								System.out.println("Write legal password or login");
 							}
 						
-						}//}
+						}
 						System.out.println(regg);
 						//System.out.println(regg);
 			} catch (SQLException e) {
@@ -241,7 +251,7 @@ public class Main extends Application {
 			try {
 				DriverManager.registerDriver(new Driver());
 				 conn = DriverManager.getConnection( 
-						"jdbc:mysql://localhost/mydb?useSSL=false", "root","12345"); 
+						"jdbc:mysql://127.0.0.1/mydb?useSSL=false", "root","12345"); 
 						System.out.println("connected");
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -266,6 +276,7 @@ public class Main extends Application {
 					iname.setText(ename.getText());
 					ipass.setText(epassword.getText());
 					ilogin.setText(elogin.getText());
+					ipAd.setText(ip1.toString().replaceAll("localhost/",""));
 					System.out.println("Send");	
 					mStage.setScene(sc4);
 					mStage.show();
@@ -285,12 +296,7 @@ public class Main extends Application {
 			
 			
 			
-			try { 
-				readdb(); 
-				} catch (Exception e) { 
-				// TODO Auto-generated catch block 
-				e.printStackTrace(); 
-				} 
+			
 			
 		  // delete();
 		  
@@ -324,6 +330,12 @@ public class Main extends Application {
 		ipass.setOpacity(1);
 		ap4.getChildren().add(ipass);
 		
+		ipAd = new Label("text");
+		ipAd.setLayoutX(400);
+		ipAd.setLayoutY(250);
+		ipAd.setFont(new Font("Rockwell Condensed",36));
+		ipAd.setOpacity(1);
+		ap4.getChildren().add(ipAd);
 		
 		
 		Button signup = new Button();
@@ -349,6 +361,7 @@ public class Main extends Application {
 		back1.setOnAction(r->{
 			mStage.setScene(sc1);
 			mStage.show();
+		   
 		});
 		ap3.getChildren().add(back1);
 		
@@ -377,7 +390,7 @@ public class Main extends Application {
 			try {
 				DriverManager.registerDriver(new Driver());
 				 conn = DriverManager.getConnection( 
-						"jdbc:mysql://localhost/mydb?useSSL=false", "root","12345"); 
+						"jdbc:mysql://127.0.0.1/mydb?useSSL=false", "root","12345"); 
 						System.out.println("connected");
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -401,17 +414,8 @@ public class Main extends Application {
 			try {
 				while(rs1.next()){ 
 					if(rs1.getString(3).equals(search.getText())&&!rs1.getString(3).equals(elog)){ 
-						chooseu.setDisable(false);
-						chooseu.setOnAction(ac->{
-							lname.setText(sname.getText());
-							lname.setOpacity(1);
-						mStage.show();
-						});
-						sname.setText(rs1.getString(2));
-						sname.setOpacity(1);
-						slogin.setText(rs1.getString(3));
-						slogin.setOpacity(1);
-						sres.setOpacity(1);
+					
+						
 						System.out.println(search.getText());	
 					
 					}}
@@ -462,62 +466,26 @@ public class Main extends Application {
 		ap1.getChildren().add(password);
 		
 	}
-	public void mainGUI(){
-		ImageView bg= new ImageView("img/bg2.png");
-		bg.setLayoutX(0);
-		bg.setLayoutX(0);
-		ap2.getChildren().add(bg);
+	//public void mainGUI(){
+		//ImageView bg= new ImageView("img/bg2.png");
+		//bg.setLayoutX(0);
+		//bg.setLayoutX(0);
+		//ap2.getChildren().add(bg);
 	
 		
-		search = new TextField();
-		search.setLayoutX(45);
-		search.setLayoutY(120);
-		search.setPrefWidth(130);
-		search.setPrefHeight(18);
-		ap2.getChildren().add(search);
+		//search = new TextField();
+		//search.setLayoutX(45);
+		//search.setLayoutY(120);
+		//search.setPrefWidth(130);
+		//search.setPrefHeight(18);
+		//ap2.getChildren().add(search);
 	
-	sres = new ImageView("img/sres.png");
-	sres.setLayoutX(5);
-	sres.setLayoutY(150);
-	sres.setFitHeight(75);
-	sres.setFitWidth(177);
-	sres.setOpacity(0);
-	ap2.getChildren().add(sres);
-	
-	sname = new Label("name");
-	sname.setLayoutX(15);
-	sname.setLayoutY(150);
-	sname.setFont(new Font("Rockwell Condensed",30));
-	sname.setStyle(" -fx-text-fill: #ffffff;-fx-text-stroke-width: 4px;-fx-text-stroke-color: black;");
-	sname.setOpacity(0);
-	ap2.getChildren().add(sname);
-	
-	slogin = new Label("name");
-	slogin.setLayoutX(15);
-	slogin.setLayoutY(180);
-	slogin.setFont(new Font("Rockwell Condensed",30));
-	slogin.setStyle(" -fx-text-fill: #ffffff;-fx-text-stroke-width: 4px;-fx-text-stroke-color: black;");
-	slogin.setOpacity(0);
-	ap2.getChildren().add(slogin);
-	
-	
-	chooseu = new Button();
-	chooseu.setLayoutX(155);
-	chooseu.setLayoutY(153);
-	chooseu.setPrefHeight(68);
-	chooseu.setPrefWidth(25);
-	chooseu.setOpacity(0);
-	chooseu.setDisable(true);
-	ap2.getChildren().add(chooseu);
-	
-	lname = new Label("Name");
-	lname.setLayoutX(210);
-	lname.setLayoutY(75);
-	lname.setOpacity(0);
-	//lname.setStyle(" -fx-text-fill: #ffffff;-fx-text-stroke-width: 4px;-fx-text-stroke-color: black;");
-	lname.setFont(new Font("Rockwell Condensed",45));
-	ap2.getChildren().add(lname);
-	}
+	//sres = new ImageView("img/sres.png");
+	//sres.setLayoutX(5);
+	//sres.setLayoutY(110);
+	//sres.setFitHeight(75);
+	//sres.setFitWidth(177);
+	//}
 	public void signUpGUI(){
 		ImageView reg= new ImageView("img/registration.png");
 		reg.setLayoutX(0);
@@ -564,14 +532,13 @@ public class Main extends Application {
 	
 		
 		stat=conn.createStatement(); 
-
+		
 	rs=stat.executeQuery("Select * from table2");// register - eiy oaaeeou 
 	
-	
+
 	while(rs.next()){ 
 		System.out.println("://");
-		System.out.println(rs.getInt(1)+"//"+rs.getString(2)+"//"+rs.getString(3)+"// "+rs.getString(4)+"// "+rs.getString(5)+"// "+rs.getString(6)); 
-	// rs.getInt(1) auaia 1 eieiiee ec AA a eiinieu e.o.a 
+		System.out.println(rs.getString(1)+"//"+rs.getString(2)+"//"+rs.getString(3)+"// "+rs.getString(4)+"// "+rs.getString(5)+"// "+rs.getString(6)); 
 	
 	} 
 	 
@@ -585,40 +552,48 @@ public class Main extends Application {
 
 	
 	public void delete() throws SQLException{
-		String query = "delete from table2 ";
+		String query = "TRUNCATE table2 ";
 	      PreparedStatement preparedStmt = conn.prepareStatement(query);
 	      
 	      // execute the preparedstatement
 	      preparedStmt.execute();
-		 id=1;
+		
 	
 	}
-	
 
+	
 	public void send() throws SQLException{
+		
 		try {
 			DriverManager.registerDriver(new Driver());
 			 conn = DriverManager.getConnection( 
-					"jdbc:mysql://localhost/mydb?useSSL=false", "root","12345"); 
+					"jdbc:mysql://127.0.0.1/mydb?useSSL=false", "root","12345"); 
 					System.out.println("connected");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		
+		String ip=null;
+		try {
+			ip1 = InetAddress.getByName(ip);
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 			stat1 = conn.prepareStatement("INSERT INTO table2" 
-				+ " (Name, Login, Password,IP,Online) values (?,?,?,?,?)");
+				+ " (Name, Login, Password,IP,Online,PInfo) values (?,?,?,?,?,?)");
 		//stat1.setInt(1, 5 ); 
 		System.out.println(login.getText()+"/"+password.getText());
 		//stat1.setInt(1,id);
 		stat1.setString(1,ename.getText());
 		stat1.setString(2,elogin.getText()); 
 		stat1.setString(3,epassword.getText()); 
-		stat1.setString(4,"2");
+		stat1.setString(4,ip1.toString().replaceAll("localhost/",""));
 		stat1.setString(5,"0");
+		stat1.setString(6,"d");
 		stat1.executeUpdate(); 
 		stat1.close(); 
-		id++;
+	
 		try {
 			readdb();
 		} catch (Exception e) {
@@ -626,17 +601,22 @@ public class Main extends Application {
 			e.printStackTrace();
 		}
 	}
-	public class TurnServer extends Thread{
-	     
+	public String getName(){
+		return elog;
+		
+	}
+	//public class TurnServer extends Thread{
+		   
 
-		  public void run() {
-		   try {
-		    new Server(45536).run();
-		   } catch (IOException e) {
-		    // TODO Auto-generated catch block
-		    e.printStackTrace();
-		   }
-		  }
-		  
-		 }
+		//public void run() {
+			//try {
+				//new Server(45536).run();
+			//} catch (IOException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+			//}
+		//}
+		
+	//}
+
 }

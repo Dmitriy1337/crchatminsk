@@ -1,13 +1,36 @@
 package application;
-
 import java.net.ServerSocket; 
 
-import java.net.Socket; 
+import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.io.*; 
 import java.math.BigInteger; 
 import java.util.concurrent.BlockingQueue; 
-import java.util.concurrent.LinkedBlockingQueue; 
+import java.util.concurrent.LinkedBlockingQueue;
 
+
+import com.mysql.jdbc.Driver;
+import com.sun.prism.paint.Color;
+
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextFlow;
+import javafx.stage.Stage; 
+import javafx.scene.input.KeyEvent;
 
 
 
@@ -15,19 +38,22 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 
 /** 
-* Класс сервера. Сидит тихо на порту, принимает сообщение, создает SocketProcessor на каждое сообщение 
+* Eeann na?aa?a. Neaeo oeoi ia ii?oo, i?eieiaao niiauaiea, nicaaao SocketProcessor ia ea?aia niiauaiea 
 */ 
-public class Server { 
-	 private int smesh = (int)'a';//смещение алфавита относительно таблицы юникодов
+public class Server extends Application{ 
+	static Stage classStage = new Stage();
+	public static Connection conn;
+	private int smesh = (int)'a';//niauaiea aeoaaeoa ioiineoaeuii oaaeeou ?ieeiaia
 	 private int usmesh = (int)'A';
 	 boolean sr = false; 
 BufferedReader UL; 
 Socket s; 
-private ServerSocket ss; // сам сервер-сокет 
-private Thread serverThread; // главная нить обработки сервер-сокета 
-private int port; // порт сервер сокета. 
-//очередь, где храняться все SocketProcessorы для рассылки 
+private ServerSocket ss; // nai na?aa?-nieao 
+private Thread serverThread; // aeaaiay ieou ia?aaioee na?aa?-nieaoa 
+private int port; // ii?o na?aa? nieaoa. 
+//i?a?aau, aaa o?aiyouny ana SocketProcessoru aey ?annueee 
 BlockingQueue<SocketProcessor> q = new LinkedBlockingQueue<SocketProcessor>(); 
+String ipAdress;
 String fcouple = ""; 
 String res = ""; 
 String password = ""; 
@@ -42,152 +68,209 @@ DataInputStream in1;
 BufferedReader line; 
 int kascii[]; 
 int j; 
+Statement stat3 = null; 
+ResultSet rs1 =null;
 String userString=""; 
 String mch=""; 
 String decode =""; 
 String userLine; 
+ImageView bg;
+TextField search;
+ImageView sres;
+Scene sc2;
+AnchorPane ap2;
+TextArea chat;
+Button con;
+TextArea write;
+Button send;
+Button find;
+int k = 0;
+Label lname;
+Stage st1;
 /** 
-* Конструктор объекта сервера 
-* @param port Порт, где будем слушать входящие сообщения. 
-* @throws IOException Если не удасться создать сервер-сокет, вылетит по эксепшену, объект Сервера не будет создан 
+* Eiino?oeoi? iauaeoa na?aa?a 
+* @param port Ii?o, aaa aoaai neooaou aoiayuea niiauaiey. 
+* @throws IOException Anee ia oaanouny nicaaou na?aa?-nieao, aueaoeo ii yenaioaio, iauaeo Na?aa?a ia aoaao nicaai 
 */ 
-public Server(int port) throws IOException { 
-ss = new ServerSocket(port); // создаем сервер-сокет 
-this.port = port; // сохраняем порт. 
-line = new BufferedReader(new InputStreamReader(System.in)); 
-} 
 
 /** 
-* главный цикл прослушивания/ожидания коннекта. 
+* aeaaiue oeee i?ineooeaaiey/i?eaaiey eiiiaeoa. 
 */ 
 
+AnchorPane ap3;
+Scene sc3;
+
+public void start(Stage st) throws Exception {
+	st1 = new Stage();
+	Server.classStage = st;
+	ap2 = new AnchorPane();
+	 sc2= new Scene(ap2,700,500);
+	 ap3 = new AnchorPane();
+	 sc3= new Scene(ap3,700,500);
+	 ImageView bg= new ImageView("img/bckground.png");
+			bg.setLayoutX(0);
+			bg.setLayoutX(0);
+			ap2.getChildren().add(bg);
+		
+			
+			search = new TextField();
+			search.setLayoutX(260);
+			search.setLayoutY(185);
+			search.setPrefWidth(350);
+			search.setPrefHeight(18);
+			ap2.getChildren().add(search);
+		
+		
+	 
+
+		lname = new Label("");
+		lname.setLayoutX(325);
+		lname.setLayoutY(237);
+		lname.setPrefWidth(130);
+		lname.setPrefHeight(18);
+		lname.setFont(new Font("Rockwell Condensed",22));
+		ap2.getChildren().add(lname);
+		
+		
+		
+		Main mn = new Main();
+	String elog = 	mn.getName();
+		
+		
+	con= new Button();
+		con.setLayoutX(400);
+		con.setLayoutY(390);
+		con.setPrefWidth(120);
+		con.setPrefHeight(40);
+		con.setOpacity(0);
+		con.setOnAction(conn1->{ 
+			
+			try {
+				DriverManager.registerDriver(new Driver());
+			 conn = DriverManager.getConnection( 
+						"jdbc:mysql://127.0.0.1/mydb?useSSL=false", "root","12345"); 
+						System.out.println("connected");
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+			try {
+				stat3 = conn.createStatement();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try {
+				rs1= stat3.executeQuery("Select * from table2");
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			
+			try {
+				while(rs1.next()){ 
+					if(rs1.getString(3).equals(search.getText())&&!rs1.getString(3).equals(elog)){ 
+					ipAdress=rs1.getString(4);
+					Client cl = new Client();
+					try {
+						
+						
+						cl.start(Client.classStage);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+						st.close();
+					
+					}}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+				
+			
+		});
+		ap2.getChildren().add(con);
+		
+		//st.close();
+		find= new Button();
+		find.setLayoutX(220);
+		find.setLayoutY(171);
+		find.setPrefWidth(30);
+		find.setPrefHeight(50);
+		find.setOpacity(0);
+		find.setOnAction(f->{
+			
+			try {
+				DriverManager.registerDriver(new Driver());
+			 conn = DriverManager.getConnection( 
+						"jdbc:mysql://127.0.0.1/mydb?useSSL=false", "root","12345"); 
+						System.out.println("connected");
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+			try {
+				stat3 = conn.createStatement();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try {
+				rs1= stat3.executeQuery("Select * from table2");
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			
+			try {
+				while(rs1.next()){ 
+					if(rs1.getString(3).equals(search.getText())&&!rs1.getString(3).equals(elog)){ 
+					 lname.setText(search.getText());
+						
+						//System.out.println(search.getText());	
+					
+					}}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+		});
+		ap2.getChildren().add(find);
+		
+		
+		
+		
+		
+	
+		
+		
+		
+		st.setScene(sc2);
+	    st.show();
+		new Thread(new SServer()).start();
+
+}
 
 
-
-
-
-void run() { 
-serverThread = Thread.currentThread(); // со старта сохраняем нить (чтобы можно ее было interrupt()) 
-while (true) { //бесконечный цикл, типа... 
-Socket s = getNewConn(); // получить новое соединение или фейк-соедиение 
-if (serverThread.isInterrupted()) { // если это фейк-соединение, то наша нить была interrupted(), 
-// надо прерваться 
-break; 
-} else if (s != null){ // "только если коннект успешно создан"... 
-try { 
-final SocketProcessor processor = new SocketProcessor(s); // создаем сокет-процессор 
-final Thread thread = new Thread(processor); // создаем отдельную асинхронную нить чтения из сокета 
-thread.setDaemon(true); //ставим ее в демона (чтобы не ожидать ее закрытия) 
-thread.start(); //запускаем 
-q.offer(processor); //добавляем в список активных сокет-процессоров 
-//OutputStream sout = s.getOutputStream(); 
-//DataOutputStream out = new DataOutputStream(sout); 
-
-
-
-try { 
-
-InputStream sin1 = s.getInputStream(); 
-DataInputStream in1 = new DataInputStream(sin1); 
-OutputStream sout1 = s.getOutputStream(); 
-OutputStream sout2 = s.getOutputStream(); 
-OutputStream sout3 = s.getOutputStream(); 
-DataOutputStream out1 = new DataOutputStream(sout1); 
-DataOutputStream out2 = new DataOutputStream(sout2); 
-DataOutputStream out3 = new DataOutputStream(sout3); 
-
-
-int a = (int)(Math.random()*199999+1000);//Генерируем 3 числа 
-int g = (int)(Math.random()*99999999+10000000); 
-int p = (int)(Math.random()*99999999+10000000); 
-long g1 = g; 
-long p1 = p; 
-BigInteger p2 = BigInteger.valueOf(p1); 
-BigInteger A = BigInteger.valueOf(g1).pow(a).mod(p2);//На основе трех чисел создаем число А 
-String A1= A.toString(); 
-out1.writeInt(g);//Отправляем два числа и само А клиенту 
-out2.writeInt(p); 
-out3.writeUTF(A1); 
-
-String B = in1.readUTF();//Полученное в клиенте В 
-int B1 = Integer.parseInt(B); 
-long B2 = B1; 
-
-
-BigInteger K = BigInteger.valueOf(B2).pow(a).mod(p2);//Создание одинакового числа и его преобразования в ключ 
-
-K= K.pow(11); 
-password = K.toString(); 
-
-for(int i = 1;i<password.length();i++){ 
-char char1 = password.charAt(i); 
-
-// System.out.println(char1); 
-
-fcouple = fcouple + char1; 
-if(i%4==0){ 
-
-
-for(int z = 0;z<4;z++){ 
-char bc = (fcouple.charAt(z)); 
-
-chislo+=bc-48; 
-
-shetchik+=chislo; 
-
-
-chislo = 0; 
-
-} 
-
-
-massiv[mcount] =shetchik; 
-if(mcount<=10){mcount++;} 
-
-fcouple ="";
-shetchik = 0; 
-
-} 
-
-} 
-int pres = 0; 
-
-for(int sh = 1;sh<12;sh++){ 
-
-pres =(massiv[sh]+92); 
-
-if(pres>=91&&pres<97){ 
-pres+=6; 
-
-} 
-else if(pres>122){ 
-pres=pres-26; 
-} 
-System.out.println(pres); 
-res = (res + (char)pres);//Полученный ключ 
-
-} 
-sr = true; 
-System.out.println(res); 
-} catch (IOException e1) { 
-// TODO Auto-generated catch block 
-e1.printStackTrace(); 
-} 
-} 
-
-catch (IOException ignored) {} 
-} 
-} 
-} 
 
 /** 
-* Ожидает новое подключение. 
-* @return Сокет нового подключения 
+* I?eaaao iiaia iiaee??aiea. 
+* @return Nieao iiaiai iiaee??aiey 
 */ 
 private Socket getNewConn() { 
 Socket s = null; 
 try { 
 s = ss.accept(); 
+windowGUI();
+System.out.println("test");
 } catch (IOException e) { 
 
 } 
@@ -213,7 +296,7 @@ public String encrypt(String text, String keyWord)
 	   for(int i = 0; i < text.length();i++)
 	    {
 	       
-	        //в num лежит номер буквы в алфавите
+	        //a num ea?eo iiia? aoeau a aeoaaeoa
 	     char c;
 	    
 	     int num = ((text.charAt(i) + keyWord.charAt(i % keyWord.length()) - 2 * smesh) % 26);
@@ -222,7 +305,7 @@ public String encrypt(String text, String keyWord)
 	    	 c = (char)(num + smesh);
 	      
 	     
-//	      char c = (char)(num + smesh);//получаем нужный символ
+//	      char c = (char)(num + smesh);//iieo?aai io?iue neiaie
 	        ans.append(c);
 	    }
 	  String result = "";
@@ -252,184 +335,15 @@ public String encrypt(String text, String keyWord)
 
 
 
-String shifr(String userString){ 
 
-kascii = new int[res.length()]; 
 
 
-for(int a = 0;a<res.length();a++){ 
-
-kascii[a] = (int)res.charAt(a); 
-
-}//перевод ключа в ascii код 
-for (int c = 0; c <userString.length();c++){ 
-
-j = c%kascii.length; 
-if(userString.charAt(c)==32){ 
-int shmessage = 32; 
-
-
-mch = mch + (char)( shmessage); 
-} 
-if(userString.charAt(c)==44){ 
-int shmessage = 44; 
-
-
-mch = mch + (char)( shmessage); 
-} 
-if(userString.charAt(c)==46){ 
-int shmessage = 46; 
-
-
-mch = mch + (char)( shmessage); 
-} 
-if(userString.charAt(c)==63){ 
-int shmessage = 63; 
-System.out.println(shmessage); 
-
-mch = mch + (char)( shmessage); 
-} 
-if(userString.charAt(c)==33){ 
-int shmessage = 33; 
-
-
-mch = mch + (char)( shmessage); 
-} 
-if(userString.charAt(c)==96){ 
-int shmessage = 96; 
-System.out.println(shmessage); 
-
-mch = mch + (char)( shmessage); 
-} 
-
-
-if((userString.charAt(c)>=65)&(userString.charAt(c)<=90)){ 
-int shmessage = (userString.charAt(c)+kascii[j]-97)%(26+96); 
-
-
-if(shmessage<=96){ 
-shmessage= shmessage +97 ; 
-} 
-if(shmessage>122){ 
-shmessage = shmessage-70;//%121+96; 
-} 
-shmessage = shmessage+32; 
-
-mch = mch + (char)( shmessage); 
-
-
-} 
-
-if(userString.charAt(c)>96){ 
-int shmessage = (userString.charAt(c)+kascii[j]-97)%(26+96); 
-
-
-if(shmessage<=96){ 
-shmessage= shmessage +97 ; 
-} 
-if(shmessage>122){ 
-shmessage = shmessage-70;//%121+96; 
-} 
-
-mch = mch + (char)( shmessage); 
-
-
-
-}} 
-
-return mch; 
-
-} 
-
-public void decode(){ 
-String kk = mch; 
-
-
-for (int c = 0; c <kk.length();c++){ 
-
-j = c%kascii.length; 
-
-if(kk.charAt(c)==32){ 
-int shmessage = 32; 
-
-
-decode = decode + (char)( shmessage); 
-} 
-if(kk.charAt(c)==44){ 
-int shmessage = 44; 
-
-
-decode = decode + (char)( shmessage); 
-} 
-if(kk.charAt(c)==46){ 
-int shmessage = 46; 
-
-
-decode = decode + (char)( shmessage); 
-} 
-if(kk.charAt(c)==63){ 
-int shmessage = 63; 
-
-
-decode = decode + (char)( shmessage); 
-} 
-if(kk.charAt(c)==33){ 
-int shmessage = 33; 
-
-
-decode = decode + (char)( shmessage); 
-} 
-if(kk.charAt(c)==96){ 
-int shmessage = 96; 
-
-
-decode = decode + (char)( shmessage); 
-} 
-//loppomxfkhj//wca//rst 
-
-
-if((kk.charAt(c)>=65)&(kk.charAt(c)<90)){ 
-int shmessage = (kk.charAt(c)- kascii[j]+66)%(26+65); 
-
-
-if(shmessage<=65){ 
-shmessage= shmessage +26; 
-
-
-
-} 
-if(shmessage>=90){ 
-shmessage = shmessage%26+65; 
-} 
-
-
-decode = decode + (char)( shmessage); // 
-
-} 
-if(kk.charAt(c)>96){ 
-int shmessage = (kk.charAt(c)-kascii[j]+97)%(26+96); 
-
-
-if(shmessage<=96){ 
-shmessage= shmessage +96 ; 
-} 
-if(shmessage>122){ 
-shmessage = shmessage-71;//%121+96; 
-} 
-
-System.out.println("message"+shmessage); 
-
-decode = decode + (char)( shmessage); // 
-
-} 
-
-
-} 
-} 
-
+public String getIp(){
+	return ipAdress;
+}
 
 private synchronized void shutdownServer() { 
-// обрабатываем список рабочих коннектов, закрываем каждый 
+// ia?aaaouaaai nienie ?aai?eo eiiiaeoia, cae?uaaai ea?aue 
 for (SocketProcessor s: q) { 
 s.close(); 
 } 
@@ -443,67 +357,70 @@ ss.close();
 
 
 /** 
-* входная точка программы 
+* aoiaiay oi?ea i?ia?aiiu 
 * @param args 
 * @throws IOException 
 */ 
 public static void main(String[] args) throws IOException { 
-new Server(45536).run(); // если сервер не создался, программа 
-// вылетит по эксепшену, и метод run() не запуститься 
+launch(args);
 } 
 
 /** 
-* вложенный класс асинхронной обработки одного коннекта. 
+* aei?aiiue eeann aneio?iiiie ia?aaioee iaiiai eiiiaeoa. 
 */ 
 private
 class SocketProcessor implements Runnable{ 
-Socket s; // наш сокет 
-BufferedReader br; // буферизировнный читатель сокета 
-BufferedWriter bw; // буферизированный писатель в сокет 
+Socket s; // iao nieao 
+BufferedReader br; // aooa?ece?iaiiue ?eoaoaeu nieaoa 
+BufferedWriter bw; // aooa?ece?iaaiiue ienaoaeu a nieao 
 
 
 /** 
-* Сохраняем сокет, пробуем создать читателя и писателя. Если не получается - вылетаем без создания объекта 
-* @param socketParam сокет 
-* @throws IOException Если ошибка в создании br || bw 
+* Nio?aiyai nieao, i?iaoai nicaaou ?eoaoaey e ienaoaey. Anee ia iieo?aaony - aueaoaai aac nicaaiey iauaeoa 
+* @param socketParam nieao 
+* @throws IOException Anee ioeaea a nicaaiee br || bw 
 */ 
 SocketProcessor(Socket socketParam) throws IOException { 
 s = socketParam; 
 br = new BufferedReader(new InputStreamReader(s.getInputStream(), "UTF-8")); 
 bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), "UTF-8") ); 
-UL = new BufferedReader(new InputStreamReader(System.in)); 
+//UL = new BufferedReader(new InputStreamReader(System.in)); 
 
 } 
 
 /** 
-* Главный цикл чтения сообщений/рассылки 
+* Aeaaiue oeee ?oaiey niiauaiee/?annueee 
 */ 
 public void run() { 
 Thread t1 = new Thread(new writeToClient());
 t1.start();
-while (!s.isClosed()) { // пока сокет не закрыт... 
+while (!s.isClosed()) { // iiea nieao ia cae?uo... 
 if(sr==true){ 
 String line = "1"; 
 try { 
-line = br.readLine(); // пробуем прочесть. 
-System.out.println(decrypt(line,res)); 
 
+line = br.readLine(); // i?iaoai i?i?anou. 
+
+System.out.println(decrypt(line,res)); 
+chat.appendText("Name1:");
+chat.appendText(decrypt(line,res));
+chat.appendText("\n");
 } catch (IOException e) { 
-close(); // если не получилось 
-//- закрываем сокет. 
+close(); // anee ia iieo?eeinu 
+//- cae?uaaai nieao. 
 } 
 
-//if (line == null) { // если строка null - клиент отключился в штатном режиме. 
-//close(); // то закрываем сокет 
-//} else if ("shutdown".equals(line)) { // если поступила команда "погасить сервер", то... 
-//serverThread.interrupt(); // сначала возводим флаг у северной нити о необходимости прерваться. 
+//if (line == null) { // anee no?iea null - eeeaio ioee??eeny a ooaoiii ?a?eia. 
+//close(); // oi cae?uaaai nieao 
+//} else if ("shutdown".equals(line)) { // anee iinooieea eiiaiaa "iiaaneou na?aa?", oi... 
+//serverThread.interrupt(); // nia?aea aicaiaei oeaa o naaa?iie ieoe i iaiaoiaeiinoe i?a?aaouny. 
 //try { 
-//new Socket("localhost", port); // создаем фейк-коннект (чтобы выйти из .accept()) 
-//} catch (IOException ignored) { //ошибки неинтересны 
+//new Socket("localhost", port); // nicaaai oaee-eiiiaeo (?oiau aueoe ec .accept()) 
+//} catch (IOException ignored) { //ioeaee iaeioa?aniu 
 //} finally { 
-//shutdownServer(); // а затем глушим сервер вызовом его метода shutdownServer(). 
+//shutdownServer(); // a caoai aeooei na?aa? auciaii aai iaoiaa shutdownServer(). 
 //} 
-//} else { // иначе - банальная рассылка по списку сокет-процессоров 
+//} else { // eia?a - aaiaeuiay ?annueea ii nieneo nieao-i?ioanni?ia 
 //for (SocketProcessor sp:q) { 
 //sp.send(us2); 
 //} 
@@ -515,36 +432,60 @@ close(); // если не получилось
 
 public class writeToClient implements Runnable{
 
-	@Override
 	public void run() {
-		while(true){
-			try { 
-
-				Usersline = UL.readLine(); 
-				us2 = encrypt(Usersline,res); 
-				mch = "";
-				bw.write(us2); // пишем строку 
-				bw.write("\n"); // пишем перевод строки 
-				bw.flush(); // отправляем 
-				} catch (IOException e) { 
-				close(); //если глюк в момент отправки - закрываем данный сокет. 
-				} 
-			
-			
-			
+		
+		   
+		   Platform.runLater(() ->{
+		            
+		            	
+		            	send.setOnAction(sen->{ 
+		        		try { 
+		        		      
+		        						//Usersline = UL.readLine(); 
+		        						Usersline  = write.getText();
+		        						//System.out.println(Usersline);
+		        						
+		        						us2 = encrypt(Usersline,res); 
+		        					  
+		        						bw.write(us2); // ieoai no?ieo 
+		        						bw.write("\n"); // ieoai ia?aaia no?iee 
+		        						bw.flush(); // ioi?aaeyai 
+                                        chat.appendText("You:");
+		        						
+		        						chat.appendText(decrypt(us2,res));
+		        						
+		        						chat.appendText("\n");
+		        						  mch = "";
+		        						write.clear();
+		        					} catch (IOException e) { 
+		        						close(); //anee ae?e a iiiaio ioi?aaee - cae?uaaai aaiiue nieao. 
+		        						} 
+		        					
+		        					
+		        				
+		        			
+		        		});
+		        		
+		        		   
+		           
+		            
+		        });
+		    
+		
+	
 		}
 		
-	}
+	
 	
 }
 
 
 
 public synchronized void close() { 
-q.remove(this); //убираем из списка 
+q.remove(this); //oae?aai ec nienea 
 if (!s.isClosed()) { 
 try { 
-s.close(); // закрываем 
+s.close(); // cae?uaaai 
 } catch (IOException ignored) {} 
 } 
 } 
@@ -554,11 +495,11 @@ try {
 Usersline = UL.readLine(); 
 us2 = encrypt(Usersline,res); 
 mch = "";
-bw.write(us2); // пишем строку 
-bw.write("\n"); // пишем перевод строки 
-bw.flush(); // отправляем 
+bw.write(us2); // ieoai no?ieo 
+bw.write("\n"); // ieoai ia?aaia no?iee 
+bw.flush(); // ioi?aaeyai 
 } catch (IOException e) { 
-close(); //если глюк в момент отправки - закрываем данный сокет. 
+close(); //anee ae?e a iiiaio ioi?aaee - cae?uaaai aaiiue nieao. 
 } 
 } 
 
@@ -583,7 +524,7 @@ System.out.println("shifr LC "+shifr+"//"+letters);
 for(int i = 0; i < shifr.length();i++)
 {
     int num = ((shifr.charAt(i)  - keyWord.charAt(i % keyWord.length()) + 26) % 26);
-    //обратные преобразования с номером буквы в алфавите
+    //ia?aoiua i?aia?aciaaiey n iiia?ii aoeau a aeoaaeoa
     char c;
    
    // System.out.print(shifr.charAt(i)+"/"+num+"//");
@@ -615,5 +556,150 @@ for(int j = 0;j<ans.toString().length();j++){
 }
 System.out.println("res"+result);
 return result;}
+
+
+
+public class SServer implements Runnable{
+
+
+	public void run() {
+		
+		try {
+			ss = new ServerSocket(45536);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} // nicaaai na?aa?-nieao 
+		
+		line = new BufferedReader(new InputStreamReader(System.in)); 
+		serverThread = Thread.currentThread(); // ni noa?oa nio?aiyai ieou (?oiau ii?ii aa auei interrupt()) 
+		while (true) { //aaneiia?iue oeee, oeia... 
+		Socket s = getNewConn(); // iieo?eou iiaia niaaeiaiea eee oaee-niaaeaiea 
+		if (serverThread.isInterrupted()) { // anee yoi oaee-niaaeiaiea, oi iaoa ieou auea interrupted(), 
+		// iaai i?a?aaouny 
+		break; 
+		} else if (s != null){ // "oieuei anee eiiiaeo oniaoii nicaai"... 
+		try { 
+		final SocketProcessor processor = new SocketProcessor(s); // nicaaai nieao-i?ioanni? 
+		final Thread thread = new Thread(processor); // nicaaai ioaaeuio? aneio?iiio? ieou ?oaiey ec nieaoa 
+		thread.setDaemon(true); //noaaei aa a aaiiia (?oiau ia i?eaaou aa cae?uoey) 
+		thread.start(); //caioneaai 
+		q.offer(processor); //aiaaaeyai a nienie aeoeaiuo nieao-i?ioanni?ia 
+		//OutputStream sout = s.getOutputStream(); 
+		//DataOutputStream out = new DataOutputStream(sout); 
+
+
+
+		try { 
+
+		InputStream sin1 = s.getInputStream(); 
+		DataInputStream in1 = new DataInputStream(sin1); 
+		OutputStream sout1 = s.getOutputStream(); 
+		OutputStream sout2 = s.getOutputStream(); 
+		OutputStream sout3 = s.getOutputStream(); 
+		DataOutputStream out1 = new DataOutputStream(sout1); 
+		DataOutputStream out2 = new DataOutputStream(sout2); 
+		DataOutputStream out3 = new DataOutputStream(sout3); 
+
+
+		int a = (int)(Math.random()*199999+1000);//Aaia?e?oai 3 ?enea 
+		int g = (int)(Math.random()*99999999+10000000); 
+		int p = (int)(Math.random()*99999999+10000000); 
+		long g1 = g; 
+		long p1 = p; 
+		BigInteger p2 = BigInteger.valueOf(p1); 
+		BigInteger A = BigInteger.valueOf(g1).pow(a).mod(p2);//Ia iniiaa o?ao ?enae nicaaai ?enei A 
+		String A1= A.toString(); 
+		out1.writeInt(g);//Ioi?aaeyai aaa ?enea e naii A eeeaioo 
+		out2.writeInt(p); 
+		out3.writeUTF(A1); 
+
+		String B = in1.readUTF();//Iieo?aiiia a eeeaioa A 
+		int B1 = Integer.parseInt(B); 
+		long B2 = B1; 
+
+
+		BigInteger K = BigInteger.valueOf(B2).pow(a).mod(p2);//Nicaaiea iaeiaeiaiai ?enea e aai i?aia?aciaaiey a ee?? 
+
+		K= K.pow(11); 
+		password = K.toString(); 
+
+		for(int i = 1;i<password.length();i++){ 
+		char char1 = password.charAt(i); 
+
+		// System.out.println(char1); 
+
+		fcouple = fcouple + char1; 
+		if(i%4==0){ 
+
+
+		for(int z = 0;z<4;z++){ 
+		char bc = (fcouple.charAt(z)); 
+
+		chislo+=bc-48; 
+
+		shetchik+=chislo; 
+
+
+		chislo = 0; 
+
+		} 
+
+
+		massiv[mcount] =shetchik; 
+		if(mcount<=10){mcount++;} 
+
+		fcouple ="";
+		shetchik = 0; 
+
+		} 
+
+		} 
+		int pres = 0; 
+
+		for(int sh = 1;sh<12;sh++){ 
+
+		pres =(massiv[sh]+92); 
+
+		if(pres>=91&&pres<97){ 
+		pres+=6; 
+
+		} 
+		else if(pres>122){ 
+		pres=pres-26; 
+		} 
+		System.out.println(pres); 
+		res = (res + (char)pres);//Iieo?aiiue ee?? 
+
+		} 
+		sr = true; 
+		System.out.println(res); 
+		} catch (IOException e1) { 
+		// TODO Auto-generated catch block 
+		e1.printStackTrace(); 
+		} 
+		} 
+
+		catch (IOException ignored) {} 
+		} 
+		} 
+		}}
+
+public void windowGUI(){
+	 Platform.runLater(() ->{
+	Stage stage = new Stage();
+    AnchorPane root2= new AnchorPane();
+     Scene scene2 = new Scene(root2,600,400);
+     
+     ImageView fon = new ImageView("img/fon.png");
+     fon.setLayoutX(0);
+     fon.setLayoutY(0);
+     root2.getChildren().add(fon);
+     
+     
+     stage.setScene(scene2);
+       stage.show();
+	 });
+}
 
 }
