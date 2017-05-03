@@ -9,6 +9,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -30,6 +31,7 @@ DataOutputStream out5;
 InputStream sin; 
 DataInputStream in; 
 int p; 
+TextArea dlog,ulog,enter;
 boolean kn =false; 
 String fcouple = ""; 
 String res = ""; 
@@ -69,117 +71,50 @@ Scene sc3;
 public void start(Stage st1) throws Exception {
 
 	Client.classStage = st1;
-	ap2 = new AnchorPane();
-	 sc2= new Scene(ap2,700,500);
-	 ap3 = new AnchorPane();
-	 sc3= new Scene(ap3,700,500);
-	 ImageView bg= new ImageView("img/bg3.png");
-			bg.setLayoutX(0);
-			bg.setLayoutX(0);
-			ap2.getChildren().add(bg);
-		
-			
-			search = new TextField();
-			search.setLayoutX(45);
-			search.setLayoutY(120);
-			search.setPrefWidth(130);
-			search.setPrefHeight(18);
-			ap2.getChildren().add(search);
-		
-		sres = new ImageView("img/sres.png");
-		sres.setLayoutX(5);
-		sres.setLayoutY(110);
-		sres.setFitHeight(75);
-		sres.setFitWidth(177);
-	
-		//MenuBar mainBar = new MenuBar();
-		//mainBar.setLayoutX(0);
-		///mainBar.setLayoutY(0);
-		//mainBar.add
-		//ap2.getChildren().add(mainBar);
-		
-		
-		con= new Button();
-		con.setLayoutX(572);
-		con.setLayoutY(79);
-		con.setPrefWidth(30);
-		con.setPrefHeight(30);
-		con.setOpacity(0);
-		con.setOnAction(conn->{ 
-				
-				//try {
-				//	new Client("localhost",45536).run();
-				//} catch (IOException e) {
-					// TODO Auto-generated catch block
-				//	e.printStackTrace();
-				//}
-				
-				//st.close();
-				
-			//Thread tc = new LaunchClient();
-		        //tc.start();
-		});
-		ap2.getChildren().add(con);
-		
-		//st.close();
-		
-		send= new Button();
-		send.setLayoutX(632);
-		send.setLayoutY(462);
-		send.setPrefWidth(50);
-		send.setPrefHeight(30);
-		send.setOpacity(0);
-		
-		ap2.getChildren().add(send);
-		
-		chat = new TextArea();
-		chat.setLayoutX(211);
-		chat.setLayoutY(163);
-		chat.setPrefWidth(431);
-		chat.setPrefHeight(260);
-		chat.setFont(new Font(16));
-		
-		chat.setStyle("-fx-text-inner-color: red;");
-		chat.setEditable(false);
-		ap2.getChildren().add(chat);
-		
-		write = new TextArea();
-		write.setLayoutX(200);
-		write.setLayoutY(450);
-		write.setPrefWidth(420);
-		write.setPrefHeight(45);
-	    
-		leave = new Button();
-		leave.setLayoutX(570);
-		leave.setLayoutY(75);
-		leave.setPrefHeight(40);
-		leave.setPrefWidth(30);
-		leave.setOpacity(0);
-		leave.setOnAction(f->{
-		try {
-			s.close();
-			Server s = new Server();
-			try {
-				s.start(Server.classStage);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			st1.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-			
-			
-		});
-		//write.setOpacity(1);
-		ap2.getChildren().add(leave);
-	     ap2.getChildren().add(write);
-		
-		
-		st1.setScene(sc2);
-	    st1.show();
+	Stage stage = new Stage();
+    AnchorPane root2= new AnchorPane();
+     Scene scene2 = new Scene(root2,600,400);
+     
+     ImageView fon = new ImageView("img/fon.png");
+     fon.setLayoutX(0);
+     fon.setLayoutY(0);
+     root2.getChildren().add(fon);
+     
+     
+      ulog = new TextArea();
+     ulog.setPrefHeight(245);
+     ulog.setPrefWidth(245);
+     ulog.setLayoutX(65);
+     ulog.setLayoutY(75);
+     ulog.setEditable(false);
+     root2.getChildren().add(ulog);
+     
+      dlog = new TextArea();
+     dlog.setPrefHeight(245);
+     dlog.setPrefWidth(240);
+     dlog.setLayoutX(315);
+     dlog.setLayoutY(75);
+     dlog.setEditable(false);
+     root2.getChildren().add(dlog);
+     
+      enter = new TextArea();
+     enter.setPrefHeight(43);
+     enter.setPrefWidth(410);
+     enter.setLayoutX(65);
+     enter.setLayoutY(320);
+     
+     send = new Button();//470*325
+     send.setLayoutX(470);
+     send.setLayoutY(320);
+     send.setPrefHeight(41);
+     send.setOpacity(0);
+     send.setPrefWidth(86);
+     root2.getChildren().add(send);
+     root2.getChildren().add(enter);
+     
+     
+     stage.setScene(scene2);
+       stage.show();
 new Thread(new CClient()).start();	
 
 }
@@ -291,57 +226,68 @@ e.printStackTrace();
 
 public String encrypt(String text, String keyWord)
 {
-  
-	StringBuilder ans = new StringBuilder();
-	String letters = "";
-	for(int i = 0;i<text.length();i++){
+	  
+		StringBuilder ans = new StringBuilder();
+		String letters = "";
+		for(int i = 0;i<text.length();i++){
+		   
+		   if(text.charAt(i)<96){
+			   letters = letters+1;
+			    
+		   }
+		   else{
+			   letters = letters+0;   
+		   }
+	   }
+	  text.toLowerCase();
+	   for(int i = 0; i < text.length();i++)
+	    {
+	       
+	        //a num ea?eo iiia? aoeau a aeoaaeoa
+	     char c=1;
+	     System.out.println((int)text.charAt(i)+"/");
+	     if(text.charAt(i)>=1040&&text.charAt(i)<1123){
+		    System.out.println("sm+"+(int)smesh);	
+	    	 smesh = Integer.valueOf(160);
+		    }
+		 else{
+			 smesh = 'a';	 
+		 }
+	     if(text.charAt(i)>=32&&text.charAt(i)<64){
+	    	c = text.charAt(i);
+	    }
+	    else{ 
+	    int num = ((text.charAt(i) + keyWord.charAt(i % keyWord.length()) - 2 * smesh) % 26);
 	   
-	   if(text.charAt(i)<96){
-		   letters = letters+1;
-		    
-	   }
-	   else{
-		   letters = letters+0;   
-	   }
-   }
-  text.toLowerCase();
-   for(int i = 0; i < text.length();i++)
-    {
-       
-        //a num ea?eo iiia? aoeau a aeoaaeoa
-     char c;
-    
-     int num = ((text.charAt(i) + keyWord.charAt(i % keyWord.length()) - 2 * smesh) % 26);
-   
-    	
-    	 c = (char)(num + smesh);
-      
-     
-//      char c = (char)(num + smesh);//iieo?aai io?iue neiaie
-        ans.append(c);
-    }
-  String result = "";
- String a = "";
- char b; 
- for(int i = 0;i<ans.toString().length();i++){
-	if(letters.charAt(i)==49){
-	//System.out.println("ssss");
-	a+=ans.toString().charAt(i);
-	a.toUpperCase();
-	b = a.charAt(0);
-	result+=b;
-	a="";
-	
-	}   
-	else{
-		result+=ans.toString().charAt(i);
+	    	
+	    	 c = (char)(num + smesh);
+	    }
+	     
+//	      char c = (char)(num + smesh);//iieo?aai io?iue neiaie
+	        ans.append(c);
+	    }
+	  String result = "";
+	 String a = "";
+	 char b; 
+	 for(int i = 0;i<ans.toString().length();i++){
+		if(letters.charAt(i)==49){
+		//System.out.println("ssss");
+		a+=ans.toString().charAt(i);
+		a.toUpperCase();
+		b = a.charAt(0);
+		result+=b;
+		a="";
 		
-		
-	}  
- }
-System.out.println("res"+result);
-System.out.println("decr"+decrypt(result,res));
-return result;
+		}   
+		else{
+			result+=ans.toString().charAt(i);
+			
+			
+		}  
+	 }
+	System.out.println("res"+result);
+	System.out.println("decr"+decrypt(result,res));
+	return result;
 
 }
 
@@ -386,8 +332,10 @@ if(kn==true){
 String line = null; 
 try { 
 line = socketReader.readLine(); // i?iaoai i?i?anou 
-chat.appendText("Name2"+decrypt(line,res));
-chat.appendText("\n");
+ulog.appendText("Name2 "+line);
+ulog.appendText("\n");
+dlog.appendText("Name2 "+decrypt(line,res));
+dlog.appendText("\n");
 } catch (IOException e) { // anee a iiiaio ?oaiey ioeaea, oi... 
 // i?iaa?ei, ?oi yoi ia aaiaeuiia ooaoiia cae?uoea nieaoa na?aa?ii 
 if ("Socket closed".equals(e.getMessage())) { 
@@ -411,58 +359,67 @@ System.out.println("Server:" + decrypt(line,res));
 } 
 
 public String decrypt(String shifr, String keyWord)
-{
-    StringBuilder ans = new StringBuilder();
-    String letters = "";
-	for(int i = 0;i<shifr.length();i++){
-	   
-	   if(shifr.charAt(i)<96){
-		   letters = letters+1;
-		    
-	   }
-	   else{
-		   letters = letters+0;   
-	   }
+{ StringBuilder ans = new StringBuilder();
+String letters = "";
+for(int i = 0;i<shifr.length();i++){
+   
+   if(shifr.charAt(i)<96){
+	   letters = letters+1;
+	    
    }
+   else{
+	   letters = letters+0;   
+   }
+}
 
-  shifr =  shifr.toLowerCase();
-	System.out.println("shifr LC "+shifr+"//"+letters);
-   for(int i = 0; i < shifr.length();i++)
-    {
-        int num = ((shifr.charAt(i)  - keyWord.charAt(i % keyWord.length()) + 26) % 26);
-        //ia?aoiua i?aia?aciaaiey n iiia?ii aoeau a aeoaaeoa
-        char c;
-       
-       // System.out.print(shifr.charAt(i)+"/"+num+"//");
-       
-         c = (char)(num + smesh);
-      
-    	
-        ans.append(c);
-       
-    }
-    String result = "";
-    String a = "";
-    char b; 
-    for(int j = 0;j<ans.toString().length();j++){
-   	if(letters.charAt(j)==49){
-   	System.out.println("s");
-   	a+=ans.toString().charAt(j);
-   	a = a.toUpperCase();
-   	b = a.charAt(0);
-   	result+=b;
-   	a="";
-   	
-   	}   
-   	else{
-   		result+=ans.toString().charAt(j);
-   		
-   		
-   	}  
-    }
-   System.out.println("res"+result);
-    return result;
-}//
+shifr =  shifr.toLowerCase();
+System.out.println("shifr LC "+shifr+"//"+letters);
+for(int i = 0; i < shifr.length();i++)
+{
+	 char c; 
+	 if(shifr.charAt(i)>=1040&&shifr.charAt(i)<1123){
+	    	smesh = 'à';
+	    }
+	 else{
+		 smesh = 'a';	 
+	 }
+	 if(shifr.charAt(i)>=32&&shifr.charAt(i)<64){
+	    	c = shifr.charAt(i);
+	    }
+	    else{ 
+	int num = ((shifr.charAt(i)  - keyWord.charAt(i % keyWord.length()) + 26) % 26);
+    //ia?aoiua i?aia?aciaaiey n iiia?ii aoeau a aeoaaeoa
+   
+   
+   // System.out.print(shifr.charAt(i)+"/"+num+"//");
+   
+     c = (char)(num + smesh);
+	    }
+	
+    ans.append(c);
+   
+}
+String result = "";
+String a = "";
+char b; 
+for(int j = 0;j<ans.toString().length();j++){
+	if(letters.charAt(j)==49){
+	System.out.println("s");
+	a+=ans.toString().charAt(j);
+	a = a.toUpperCase();
+	b = a.charAt(0);
+	result+=b;
+	a="";
+	
+	}   
+	else{
+		result+=ans.toString().charAt(j);
+		
+		
+	}  
+}
+System.out.println("res"+result);
+return result;}//
 
 
 public class CClient implements Runnable{
@@ -505,13 +462,44 @@ public class CClient implements Runnable{
 //String us1 = ""; 
 	//try { 
 	//userString = userInput.readLine(); // ?eoaai no?ieo io iieuciaaoaey 
-	send.setOnAction(senn->{
-	String userString = write.getText();
+		enter.setOnKeyPressed(f->{
+    		System.out.print("key");
+    		if (f.getCode() == KeyCode.ENTER) {
+    			
+
+    			String userString = enter.getText();
+    			String	us1 = encrypt(userString,res); 
+    			ulog.appendText("You:"+us1);
+    			ulog.appendText("\n");
+    			dlog.appendText("You:"+decrypt(us1,res));
+    			dlog.appendText("\n");
+    			mch = "";
+    			 enter.setText("");
+    			try { 
+    			socketWriter.write(us1); //ieoai no?ieo iieuciaaoaey 
+    			socketWriter.write("\n"); //aiaaaeyai "iiai? no?ieo", aaau readLine() na?aa?a n?aaioae 
+    			socketWriter.flush(); // ioi?aaeyai 
+    			
+    			} catch (IOException e) { 
+    			close(); // a e?aie ioeaea - cae?uaaai. 
+    			} 
+    			 
+    			
+    			
+    			
+    			
+    			
+    		}});
+		
+		send.setOnAction(senn->{
+	String userString = enter.getText();
 	String	us1 = encrypt(userString,res); 
-	chat.appendText("You:"+decrypt(us1,res));
-	chat.appendText("\n");
+	ulog.appendText("You:"+us1);
+	ulog.appendText("\n");
+	dlog.appendText("You:"+decrypt(us1,res));
+	dlog.appendText("\n");
 	mch = "";
-	 write.clear();
+	 enter.setText("");
 	try { 
 	socketWriter.write(us1); //ieoai no?ieo iieuciaaoaey 
 	socketWriter.write("\n"); //aiaaaeyai "iiai? no?ieo", aaau readLine() na?aa?a n?aaioae 
@@ -562,7 +550,7 @@ public class CClient implements Runnable{
 		for(int i = 1;i<password.length();i++){ 
 		char char1 = password.charAt(i); 
 
-		// System.out.println(char1); 
+		// System.out.println(char1À); 
 
 		fcouple = fcouple + char1; 
 		if(i%4==0){ 

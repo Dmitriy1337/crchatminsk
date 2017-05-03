@@ -34,7 +34,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextFlow;
-import javafx.stage.Stage; 
+import javafx.stage.Stage;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 
@@ -49,7 +50,7 @@ public class Server extends Application{
 	InetAddress	ip1;
 	static Stage classStage = new Stage();
 	public static Connection conn;
-	private int smesh = (int)'a';//niauaiea aeoaaeoa ioiineoaeuii oaaeeou ?ieeiaia
+	 int smesh = (int)'a';//niauaiea aeoaaeoa ioiineoaeuii oaaeeou ?ieeiaia
 	 private int usmesh = (int)'A';
 	 boolean sr = false; 
 BufferedReader UL; 
@@ -69,6 +70,7 @@ int chislo = 0;
 int shetchik = 0; 
 int mcount = 1; 
 int massiv[] =new int[12]; 
+TextArea dlog,ulog,enter;
 InputStream sin1; 
 DataInputStream in1; 
 BufferedReader line; 
@@ -409,13 +411,24 @@ public String encrypt(String text, String keyWord)
 	    {
 	       
 	        //a num ea?eo iiia? aoeau a aeoaaeoa
-	     char c;
-	    
-	     int num = ((text.charAt(i) + keyWord.charAt(i % keyWord.length()) - 2 * smesh) % 26);
+	     char c=1;
+	     System.out.println((int)text.charAt(i)+"/");
+	     if(text.charAt(i)>=1040&&text.charAt(i)<1123){
+		    System.out.println("sm+"+(int)smesh);	
+	    	 smesh = 'à';
+		    }
+		 else{
+			 smesh = 'a';	 
+		 }
+	     if(text.charAt(i)>=32&&text.charAt(i)<64){
+	    	c = text.charAt(i);
+	    }
+	    else{ 
+	    int num = ((text.charAt(i) + keyWord.charAt(i % keyWord.length()) - 2 * smesh) % 26);
 	   
 	    	
 	    	 c = (char)(num + smesh);
-	      
+	    }
 	     
 //	      char c = (char)(num + smesh);//iieo?aai io?iue neiaie
 	        ans.append(c);
@@ -514,9 +527,12 @@ try {
 line = br.readLine(); // i?iaoai i?i?anou. 
 
 System.out.println(decrypt(line,res)); 
-chat.appendText("Name1:");
-chat.appendText(decrypt(line,res));
-chat.appendText("\n");
+ulog.appendText("Name1:");
+ulog.appendText(line);
+ulog.appendText("\n");
+dlog.appendText("Name1:");
+dlog.appendText(decrypt(line,res));
+dlog.appendText("\n");
 } catch (IOException e) { 
 close(); // anee ia iieo?eeinu 
 //- cae?uaaai nieao. 
@@ -549,26 +565,60 @@ public class writeToClient implements Runnable{
 		   
 		   Platform.runLater(() ->{
 		            
-		            	
+		            	enter.setOnKeyPressed(f->{
+		            		System.out.print("key");
+		            		if (f.getCode() == KeyCode.ENTER) {
+		            			System.out.print("enter");
+		 		        		try { 
+		 		        		      
+		 		        						//Usersline = UL.readLine(); 
+		 		        						Usersline  = enter.getText();
+		 		        						//System.out.println(Usersline);
+		 		        						us2 = encrypt(Usersline,res);
+		 		        						ulog.appendText("You:");
+		 		        						ulog.appendText(Usersline);
+		 		        						ulog.appendText("\n");
+		 		        						 
+		 		        					  
+		 		        						bw.write(us2); // ieoai no?ieo 
+		 		        						bw.write("\n"); // ieoai ia?aaia no?iee 
+		 		        						bw.flush(); // ioi?aaeyai 
+		                                         dlog.appendText("You:");
+		 		        						dlog.appendText(decrypt(us2,res));
+		 		        						dlog.appendText("\n");
+		 		        						  mch = "";
+		 		        						 enter.setText("");
+		 		        					} catch (IOException e) { 
+		 		        						close(); //anee ae?e a iiiaio ioi?aaee - cae?uaaai aaiiue nieao. 
+		 		        						} 
+		 		        					
+		 		        					
+		 		        				
+		 		        			
+		 		        		 
+		            		 }
+		            		
+		            	});
 		            	send.setOnAction(sen->{ 
 		        		try { 
 		        		      
 		        						//Usersline = UL.readLine(); 
-		        						Usersline  = write.getText();
-		        						//System.out.println(Usersline);
-		        						
+		        						Usersline  = enter.getText();
 		        						us2 = encrypt(Usersline,res); 
+		        						//System.out.println(Usersline);
+		        						ulog.appendText("You:");
+		        						ulog.appendText(us2);
+		        						ulog.appendText("\n");
+		        						
 		        					  
 		        						bw.write(us2); // ieoai no?ieo 
 		        						bw.write("\n"); // ieoai ia?aaia no?iee 
 		        						bw.flush(); // ioi?aaeyai 
-                                        chat.appendText("You:");
-		        						
-		        						chat.appendText(decrypt(us2,res));
-		        						
-		        						chat.appendText("\n");
+                                        dlog.appendText("You:");
+		        						dlog.appendText(decrypt(us2,res));
+		        						dlog.appendText("\n");
 		        						  mch = "";
-		        						write.clear();
+		        						  enter.setText("");
 		        					} catch (IOException e) { 
 		        						close(); //anee ae?e a iiiaio ioi?aaee - cae?uaaai aaiiue nieao. 
 		        						} 
@@ -635,14 +685,25 @@ shifr =  shifr.toLowerCase();
 System.out.println("shifr LC "+shifr+"//"+letters);
 for(int i = 0; i < shifr.length();i++)
 {
-    int num = ((shifr.charAt(i)  - keyWord.charAt(i % keyWord.length()) + 26) % 26);
+	 char c; 
+	 if(shifr.charAt(i)>=1040&&shifr.charAt(i)<1123){
+	    	smesh = 'à';
+	    }
+	 else{
+		 smesh = 'a';	 
+	 }
+	 if(shifr.charAt(i)>=32&&shifr.charAt(i)<64){
+	    	c = shifr.charAt(i);
+	    }
+	    else{ 
+	int num = ((shifr.charAt(i)  - keyWord.charAt(i % keyWord.length()) + 26) % 26);
     //ia?aoiua i?aia?aciaaiey n iiia?ii aoeau a aeoaaeoa
-    char c;
+   
    
    // System.out.print(shifr.charAt(i)+"/"+num+"//");
    
      c = (char)(num + smesh);
-  
+	    }
 	
     ans.append(c);
    
@@ -807,6 +868,38 @@ public void windowGUI(){
      fon.setLayoutX(0);
      fon.setLayoutY(0);
      root2.getChildren().add(fon);
+     
+     
+      ulog = new TextArea();
+     ulog.setPrefHeight(245);
+     ulog.setPrefWidth(245);
+     ulog.setLayoutX(65);
+     ulog.setLayoutY(75);
+     ulog.setEditable(false);
+     root2.getChildren().add(ulog);
+     
+      dlog = new TextArea();
+     dlog.setPrefHeight(245);
+     dlog.setPrefWidth(240);
+     dlog.setLayoutX(315);
+     dlog.setLayoutY(75);
+     dlog.setEditable(false);
+     root2.getChildren().add(dlog);
+     
+      enter = new TextArea();
+     enter.setPrefHeight(43);
+     enter.setPrefWidth(410);
+     enter.setLayoutX(65);
+     enter.setLayoutY(320);
+     
+     send = new Button();//470*325
+     send.setLayoutX(470);
+     send.setLayoutY(320);
+     send.setPrefHeight(41);
+     send.setOpacity(0);
+     send.setPrefWidth(86);
+     root2.getChildren().add(send);
+     root2.getChildren().add(enter);
      
      
      stage.setScene(scene2);
