@@ -46,6 +46,7 @@ public class Main extends Application {
 	PasswordField eapassword;
 	int regg = 0;
 	public static String elog;
+	public static String enick;
 	AnchorPane ap1;
 	AnchorPane ap2;
 	AnchorPane ap3;
@@ -188,11 +189,13 @@ public class Main extends Application {
 						//	ewarning.setOpacity(1);
 							//mStage.show();	
 						//}
-						while(rs1.next()){ 
+						
+					while(rs1.next()){ 
 							if((rs1.getString(4).equals(password.getText()))&&(rs1.getString(3).equals(login.getText()))){
+								enick = rs1.getString(2);
 								System.out.println("enter");
 								regg = 1; 
-								log = login.getText();
+								elog = login.getText();
 								a=true;
 								String onl1 ="UPDATE table2 SET Online = '1' WHERE Login = '"+log+"'";
 								stat4.executeUpdate(onl1);
@@ -585,6 +588,7 @@ public class Main extends Application {
 		//stat1.setInt(1, 5 ); 
 		System.out.println(login.getText()+"/"+password.getText());
 		//stat1.setInt(1,id);
+		elog=ename.getText();
 		stat1.setString(1,ename.getText());
 		stat1.setString(2,elogin.getText()); 
 		stat1.setString(3,epassword.getText()); 
@@ -603,6 +607,10 @@ public class Main extends Application {
 	}
 	public String getName(){
 		return elog;
+		
+	}
+	public String getNick(){
+		return enick;
 		
 	}
 	//public class TurnServer extends Thread{

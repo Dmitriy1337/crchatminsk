@@ -1,7 +1,9 @@
 package application;
+import java.net.InetAddress;
 import java.net.ServerSocket; 
 
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -23,6 +25,9 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
@@ -41,6 +46,7 @@ import javafx.scene.input.KeyEvent;
 * Eeann na?aa?a. Neaeo oeoi ia ii?oo, i?eieiaao niiauaiea, nicaaao SocketProcessor ia ea?aia niiauaiea 
 */ 
 public class Server extends Application{ 
+	InetAddress	ip1;
 	static Stage classStage = new Stage();
 	public static Connection conn;
 	private int smesh = (int)'a';//niauaiea aeoaaeoa ioiineoaeuii oaaeeou ?ieeiaia
@@ -101,6 +107,7 @@ AnchorPane ap3;
 Scene sc3;
 
 public void start(Stage st) throws Exception {
+	
 	st1 = new Stage();
 	Server.classStage = st;
 	ap2 = new AnchorPane();
@@ -120,9 +127,104 @@ public void start(Stage st) throws Exception {
 			search.setPrefHeight(18);
 			ap2.getChildren().add(search);
 		
+	
+			
+			
+			
+			
+			MenuBar mb = new MenuBar();
+	 Menu crchat = new Menu("CryptoChat");
+	 MenuItem safety = new MenuItem("Safety");
+	MenuItem server = new MenuItem("Connection");
+	crchat.getItems().addAll(safety,server);
+	Menu user = new Menu("User");
+	MenuItem pd = new MenuItem("Personal Info");	
+	user.getItems().addAll(pd);
+	Menu about = new Menu("About us");
+	MenuItem ap = new MenuItem("About CryptoChat");
+	MenuItem au = new MenuItem("Authors");
+	about.getItems().addAll(ap,au);		
+	
+	
+	
+	safety.setOnAction(a1->{
+		Stage stage = new Stage();
+	    AnchorPane root2= new AnchorPane();
+	     Scene scene2 = new Scene(root2,250,350);
+	     stage.setTitle("Safety");
+	     ImageView fon = new ImageView("img/safety.png");
+	     fon.setLayoutX(0);
+	     fon.setLayoutY(0);
+	     root2.getChildren().add(fon);
+	     
+	     
+	     stage.setScene(scene2);
+	       stage.show();
 		
-	 
-
+		
+	});
+	
+	server.setOnAction(a2->{
+		Stage stage = new Stage();
+	    AnchorPane root2= new AnchorPane();
+	     Scene scene2 = new Scene(root2,250,350);
+	     stage.setTitle("Server");
+	     ImageView fon = new ImageView("img/server.png");
+	     fon.setLayoutX(0);
+	     fon.setLayoutY(0);
+	     root2.getChildren().add(fon);
+	     String ip=null;
+			try {
+				ip1 = InetAddress.getByName(ip);
+			} catch (UnknownHostException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+	     Label ipl=new Label(ip1.toString());
+	     ipl.setLayoutX(120);
+	     ipl.setLayoutY(150);
+	     ipl.setFont(new Font("Arial",14));
+	     root2.getChildren().add(ipl);
+	     stage.setScene(scene2);
+	       stage.show();
+		
+		
+	});
+	ap.setOnAction(a2->{
+		Stage stage = new Stage();
+	    AnchorPane root2= new AnchorPane();
+	     Scene scene2 = new Scene(root2,250,350);
+	     stage.setTitle("About CryptoChat");
+	     ImageView fon = new ImageView("img/ac.png");
+	     fon.setLayoutX(0);
+	     fon.setLayoutY(0);
+	     root2.getChildren().add(fon);
+	   
+	     
+	     stage.setScene(scene2);
+	       stage.show();
+		
+		
+	});
+	au.setOnAction(a2->{
+		Stage stage = new Stage();
+	    AnchorPane root2= new AnchorPane();
+	     Scene scene2 = new Scene(root2,250,350);
+	     stage.setTitle("About CryptoChat");
+	     ImageView fon = new ImageView("img/au.png");
+	     fon.setLayoutX(0);
+	     fon.setLayoutY(0);
+	     root2.getChildren().add(fon);
+	   
+	     
+	     stage.setScene(scene2);
+	       stage.show();
+		
+		
+	});
+	
+	mb.getMenus().addAll(crchat,user,about)	;
+ap2.getChildren().add(mb);
 		lname = new Label("");
 		lname.setLayoutX(325);
 		lname.setLayoutY(237);
@@ -135,8 +237,18 @@ public void start(Stage st) throws Exception {
 		
 		Main mn = new Main();
 	String elog = 	mn.getName();
+	System.out.println(elog);
+	st.setTitle("CryptoChat™ - "+elog);	
 		
-		
+	
+	Label username= new Label();
+	username.setLayoutX(40);
+	username.setLayoutY(32);
+	username.setFont(new Font("Rockwell Condensed",30));
+	username.setText(mn.getNick());
+	ap2.getChildren().add(username);
+	
+	
 	con= new Button();
 		con.setLayoutX(400);
 		con.setLayoutY(390);
