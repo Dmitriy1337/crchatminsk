@@ -15,6 +15,9 @@ import javafx.stage.StageStyle;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -72,11 +75,14 @@ public class Main extends Application {
 	PreparedStatement stat1 = null;
 	PreparedStatement stat2 = null;
 	Label iname;
+	ImageView reg;
 	Label ipass;
 	Label ipAd;
 	Label ilogin;
-
-	public void start(Stage mStage) {
+	 ImageView fon;
+	 ImageView sign;
+	 Stage stage = new Stage();
+	 public void start(Stage mStage) {
 		
 		 ap1 = new AnchorPane();
 		 sc1= new Scene(ap1,700,500);
@@ -86,11 +92,140 @@ public class Main extends Application {
 		 sc3= new Scene(ap3,700,500);
 		 ap4 = new AnchorPane();
 		 sc4= new Scene(ap4,700,500);
-		signInGUI();
+		 reg= new ImageView("img/registration.png");
+		 fon = new ImageView("img/safety.png");
+		 accinfo = new ImageView("img/accinfo.png");
+		 elogin = new TextField();//225x150
+			epassword = new PasswordField();//225x150
+			eapassword = new PasswordField();//225x150
+			ename = new TextField();//225x150
+			
+		 signInGUI();
+		
 		signUpGUI();
 		//mainGUI();
 		
-     
+		MenuBar mb = new MenuBar();
+		 Menu crchat = new Menu("CryptoChat");
+		 MenuItem safety = new MenuItem("Safety");
+		
+		crchat.getItems().addAll(safety);
+		Menu language = new Menu("Language");
+		MenuItem ru = new MenuItem("Русский");	
+		MenuItem eng = new MenuItem("English");	
+		language.getItems().addAll(ru,eng);
+		
+		MenuBar mb2 = new MenuBar();
+		 Menu crchat2 = new Menu("CryptoChat");
+		 MenuItem safety2 = new MenuItem("Safety");
+		
+		crchat2.getItems().addAll(safety2);
+		Menu language2 = new Menu("Language");
+		MenuItem ru2 = new MenuItem("Русский");	
+		MenuItem eng2 = new MenuItem("English");	
+		language2.getItems().addAll(ru2,eng2);
+		
+		safety.setOnAction(a1->{
+			
+		    AnchorPane root2= new AnchorPane();
+		     Scene scene2 = new Scene(root2,250,350);
+		     stage.setTitle("Safety");
+		    
+		     fon.setLayoutX(0);
+		     fon.setLayoutY(0);
+		     root2.getChildren().add(fon);
+		     
+		     
+		     stage.setScene(scene2);
+		       stage.show();
+			
+			
+		});
+		
+		ru.setOnAction(ra->{
+			crchat.setText("Крипточат");
+			safety.setText("Безопастность");
+			language.setText("Язык");
+			crchat2.setText("Крипточат");
+			safety2.setText("Безопастность");
+			language2.setText("Язык");
+			sign.setImage(new Image("img/signr.png"));
+			fon.setImage(new Image("img/safetyr.png"));
+			stage.setTitle("Безопастность");
+			reg.setImage(new Image("img/registrationr.png"));
+			accinfo.setImage(new Image("img/accinfor.png"));
+			ename.setLayoutY(170);
+			elogin.setLayoutY(225);
+			epassword.setLayoutY(285);
+			eapassword.setLayoutY(345);
+			iname.setLayoutY(170);
+			ilogin.setLayoutY(220);
+			ipass.setLayoutY(310);
+			ipAd.setLayoutY(350);
+			mStage.show();
+		
+		});
+		
+		
+		
+		
+		mb.getMenus().addAll(crchat,language)	;
+		ap1.getChildren().add(mb);
+		
+		
+		
+		
+		safety2.setOnAction(a1->{
+			
+		    AnchorPane root2= new AnchorPane();
+		     Scene scene2 = new Scene(root2,250,350);
+		     stage.setTitle("Safety");
+		    
+		     fon.setLayoutX(0);
+		     fon.setLayoutY(0);
+		     root2.getChildren().add(fon);
+		     
+		     
+		     stage.setScene(scene2);
+		       stage.show();
+			
+			
+		});
+		
+		ru2.setOnAction(ra->{
+			crchat.setText("Крипточат");
+			safety.setText("Безопастность");
+			language.setText("Язык");
+			crchat2.setText("Крипточат");
+			safety2.setText("Безопастность");
+			language2.setText("Язык");
+			sign.setImage(new Image("img/signr.png"));
+			fon.setImage(new Image("img/safetyr.png"));
+			stage.setTitle("Безопастность");
+			reg.setImage(new Image("img/registrationr.png"));
+			accinfo.setImage(new Image("img/accinfor.png"));
+			ename.setLayoutY(170);
+			elogin.setLayoutY(225);
+			epassword.setLayoutY(285);
+			eapassword.setLayoutY(345);
+			iname.setLayoutY(170);
+			ilogin.setLayoutY(220);
+			ipass.setLayoutY(310);
+			ipAd.setLayoutY(350);
+			mStage.show();
+		
+		});
+		
+		
+		
+		
+		mb2.getMenus().addAll(crchat2,language2)	;
+		ap3.getChildren().add(mb2);
+		
+		
+		
+		mStage.setScene(sc1);
+    mStage.show();
 		mStage.setOnCloseRequest(cr->{
 			try {
 				DriverManager.registerDriver(new Driver());
@@ -131,7 +266,7 @@ public class Main extends Application {
 		
 		});
 		
-		accinfo = new ImageView("img/accinfo.png");
+		
 		accinfo.setLayoutX(0);
 		accinfo.setLayoutY(0);
 		
@@ -141,7 +276,7 @@ public class Main extends Application {
 		
 		
 		 lwarning = new ImageView("img/warning.png");
-		lwarning.setLayoutX(520);
+		lwarning.setLayoutX(560);
 		lwarning.setLayoutY(95);
 		lwarning.setFitHeight(30);
 		lwarning.setFitWidth(40);
@@ -149,7 +284,7 @@ public class Main extends Application {
 		ap3.getChildren().add(lwarning);
 		
 		pwarning = new ImageView("img/warning.png");
-		pwarning.setLayoutX(520);
+		pwarning.setLayoutX(560);
 		pwarning.setLayoutY(270);
 		pwarning.setFitHeight(30);
 		pwarning.setFitWidth(40);
@@ -273,7 +408,7 @@ public class Main extends Application {
 			System.out.println(isTrue);
 			if(!isTrue){
 				lwarning.setOpacity(0);
-				if(epassword.getText().equals(eapassword.getText())){
+				if((epassword.getText()!="")&&(ename.getText()!="")&&(elogin.getText()!="")&&(eapassword.getText()!="")&&(epassword.getText().equals(eapassword.getText()))){
 					send();	
 					pwarning.setOpacity(0);
 					iname.setText(ename.getText());
@@ -318,6 +453,8 @@ public class Main extends Application {
 		iname.setFont(new Font("Rockwell Condensed",36));
 		iname.setOpacity(1);
 		ap4.getChildren().add(iname);
+		
+		
 		
 		ilogin = new Label("text");
 		ilogin.setLayoutX(400);
@@ -448,7 +585,11 @@ public class Main extends Application {
 	}
 
 	public void signInGUI(){
-		ImageView sign= new ImageView("img/sign.png");
+	
+		
+		
+		
+		sign= new ImageView("img/sign.png");
 		sign.setLayoutX(0);
 		sign.setLayoutX(0);
 		ap1.getChildren().add(sign);
@@ -464,10 +605,11 @@ public class Main extends Application {
 		
 		 password = new PasswordField();//225x150
 		password.setLayoutX(225);
-		password.setLayoutY(215);
+		password.setLayoutY(220);
 		password.setPrefWidth(270);
 		ap1.getChildren().add(password);
 		
+	
 	}
 	//public void mainGUI(){
 		//ImageView bg= new ImageView("img/bg2.png");
@@ -490,31 +632,33 @@ public class Main extends Application {
 	//sres.setFitWidth(177);
 	//}
 	public void signUpGUI(){
-		ImageView reg= new ImageView("img/registration.png");
+		 
 		reg.setLayoutX(0);
 		reg.setLayoutX(0);
 		ap3.getChildren().add(reg);
-		
 		ename = new TextField();//225x150
-		ename.setLayoutX(250);
+		ename.setLayoutX(290);
 		ename.setLayoutY(95);
 		ename.setPrefWidth(270);
 		ap3.getChildren().add(ename);
 		
+		
+		
+		
 		elogin = new TextField();//225x150
-		elogin.setLayoutX(250);
+		elogin.setLayoutX(290);
 		elogin.setLayoutY(150);
 		elogin.setPrefWidth(270);
 		ap3.getChildren().add(elogin);
 		
 		epassword = new PasswordField();//225x150
-		epassword.setLayoutX(250);
+		epassword.setLayoutX(290);
 		epassword.setLayoutY(210);
 		epassword.setPrefWidth(270);
 		ap3.getChildren().add(epassword);
 		
 		eapassword = new PasswordField();//225x150
-		eapassword.setLayoutX(250);
+		eapassword.setLayoutX(290);
 		eapassword.setLayoutY(270);
 		eapassword.setPrefWidth(270);
 		ap3.getChildren().add(eapassword);
@@ -541,7 +685,7 @@ public class Main extends Application {
 
 	while(rs.next()){ 
 		System.out.println("://");
-		System.out.println(rs.getString(1)+"//"+rs.getString(2)+"//"+rs.getString(3)+"// "+rs.getString(4)+"// "+rs.getString(5)+"// "+rs.getString(6)); 
+		System.out.println(rs.getString(1)+"//"+rs.getString(2)+"//"+rs.getString(3)+"// "+rs.getString(4)+"// "+rs.getString(5)+"// "+rs.getString(6)+"/"+rs.getString(7)); 
 	
 	} 
 	 
@@ -584,17 +728,18 @@ public class Main extends Application {
 			e1.printStackTrace();
 		}
 			stat1 = conn.prepareStatement("INSERT INTO table2" 
-				+ " (Name, Login, Password,IP,Online,PInfo) values (?,?,?,?,?,?)");
+				+ " (ID,Name, Login, Password,IP,Online,PInfo) values (?,?,?,?,?,?,?)");
 		//stat1.setInt(1, 5 ); 
 		System.out.println(login.getText()+"/"+password.getText());
 		//stat1.setInt(1,id);
 		elog=ename.getText();
-		stat1.setString(1,ename.getText());
-		stat1.setString(2,elogin.getText()); 
-		stat1.setString(3,epassword.getText()); 
-		stat1.setString(4,ip1.toString().replaceAll("localhost/",""));
-		stat1.setString(5,"0");
-		stat1.setString(6,"d");
+		stat1.setString(1,"0");
+		stat1.setString(2,ename.getText());
+		stat1.setString(3,elogin.getText()); 
+		stat1.setString(4,epassword.getText()); 
+		stat1.setString(5,ip1.toString().replaceAll("localhost/",""));
+		stat1.setString(6,"0");
+		stat1.setString(7,"d");
 		stat1.executeUpdate(); 
 		stat1.close(); 
 	

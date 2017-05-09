@@ -1,4 +1,4 @@
-package application;
+package application;//launch4j
 import java.net.InetAddress;
 import java.net.ServerSocket; 
 
@@ -30,6 +30,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
@@ -50,17 +51,20 @@ public class Server extends Application{
 	InetAddress	ip1;
 	static Stage classStage = new Stage();
 	public static Connection conn;
-	 int smesh = (int)'a';//niauaiea aeoaaeoa ioiineoaeuii oaaeeou ?ieeiaia
-	 private int usmesh = (int)'A';
+	 
+	 private int smesh = (int)'a';
+	 private int rmesh = (int)'а';
 	 boolean sr = false; 
 BufferedReader UL; 
 Socket s; 
+String pde ;
 private ServerSocket ss; // nai na?aa?-nieao 
 private Thread serverThread; // aeaaiay ieou ia?aaioee na?aa?-nieaoa 
 private int port; // ii?o na?aa? nieaoa. 
 //i?a?aau, aaa o?aiyouny ana SocketProcessoru aey ?annueee 
 BlockingQueue<SocketProcessor> q = new LinkedBlockingQueue<SocketProcessor>(); 
 String ipAdress;
+Statement stat1 = null;
 String fcouple = ""; 
 String res = ""; 
 String password = ""; 
@@ -108,6 +112,9 @@ Stage st1;
 AnchorPane ap3;
 Scene sc3;
 
+/* (non-Javadoc)
+ * @see javafx.application.Application#start(javafx.stage.Stage)
+ */
 public void start(Stage st) throws Exception {
 	
 	st1 = new Stage();
@@ -142,6 +149,10 @@ public void start(Stage st) throws Exception {
 	Menu user = new Menu("User");
 	MenuItem pd = new MenuItem("Personal Info");	
 	user.getItems().addAll(pd);
+	Menu lang = new Menu("Language");
+	MenuItem ru = new MenuItem("Русский");	
+	MenuItem en = new MenuItem("English");	
+	lang.getItems().addAll(ru,en);
 	Menu about = new Menu("About us");
 	MenuItem ap = new MenuItem("About CryptoChat");
 	MenuItem au = new MenuItem("Authors");
@@ -225,7 +236,29 @@ public void start(Stage st) throws Exception {
 		
 	});
 	
-	mb.getMenus().addAll(crchat,user,about)	;
+	ru.setOnAction(r2->{
+		
+		
+		crchat.setText("Крипточат");
+		safety.setText("Безопастность");
+		server.setText("Соединение");
+		user.setText("Пользователь");
+		pd.setText("Персональные данные");
+		lang.setText("Язык");
+		about.setText("О программе");
+		ap.setText("О КриптоЧате");
+		au.setText("Авторы");
+	bg.setImage(new Image("img/bckgroundr.png"));
+	st.show();
+	
+	
+	
+	
+	});
+	
+	
+	
+	mb.getMenus().addAll(crchat,user,lang,about)	;
 ap2.getChildren().add(mb);
 		lname = new Label("");
 		lname.setLayoutX(325);
@@ -235,12 +268,80 @@ ap2.getChildren().add(mb);
 		lname.setFont(new Font("Rockwell Condensed",22));
 		ap2.getChildren().add(lname);
 		
-		
-		
+
 		Main mn = new Main();
 	String elog = 	mn.getName();
 	System.out.println(elog);
 	st.setTitle("CryptoChat™ - "+elog);	
+		TextField fname =new TextField();
+		fname.setLayoutX(25);
+		fname.setLayoutY(95);
+		ap2.getChildren().add(fname);
+		
+		TextField sname =new TextField();
+		sname.setLayoutX(25);
+		sname.setLayoutY(165);
+		ap2.getChildren().add(sname);
+		
+		TextField country =new TextField();
+		country.setLayoutX(25);
+		country.setLayoutY(235);
+		ap2.getChildren().add(country);
+		
+		TextField city =new TextField();
+		city.setLayoutX(25);
+		city.setLayoutY(305);
+		ap2.getChildren().add(city);
+		
+		Button save = new Button();
+		save.setPrefHeight(30);
+		save.setPrefWidth(90);
+		save.setLayoutX(22);
+		save.setLayoutY(355);
+		save.setOpacity(0);
+		ap2.getChildren().add(save);
+		
+		save.setOnAction(s->{
+			try {
+				DriverManager.registerDriver(new Driver());
+				 conn = DriverManager.getConnection( 
+						"jdbc:mysql://127.0.0.1/mydb?useSSL=false", "root","12345"); 
+						System.out.println("connected");
+				stat3 = conn.createStatement();
+				rs1= stat3.executeQuery("Select * from table2");
+				stat1= conn.createStatement();
+				while(rs1.next()){ 
+				try {
+					
+					pde = fname.getText()+"/"+sname.getText()+"/"+country.getText()+"/"+city.getText();
+					
+					
+					
+					
+					String onl ="UPDATE table2 SET PInfo = '"+pde+"' WHERE Login = '"+mn.getName()+"'";
+					stat1.executeUpdate(onl);
+					
+					
+					
+				 } catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+			
+			
+			
+			
+			
+			
+		});
+		
+		
+		
 		
 	
 	Label username= new Label();
@@ -393,12 +494,12 @@ return s;
 
 public String encrypt(String text, String keyWord)
 {
-	  
+	int count = 0;  
 		StringBuilder ans = new StringBuilder();
 		String letters = "";
 		for(int i = 0;i<text.length();i++){
 		   
-		   if(text.charAt(i)<96){
+		   if(((text.charAt(i)>=65&&text.charAt(i)<96)||(text.charAt(i)>1040&&text.charAt(i)<1072))){
 			   letters = letters+1;
 			    
 		   }
@@ -407,38 +508,54 @@ public String encrypt(String text, String keyWord)
 		   }
 	   }
 	  text.toLowerCase();
-	   for(int i = 0; i < text.length();i++)
+	  System.out.println("lc "+text);
+	  for(int i = 0; i < text.length();i++)
 	    {
 	       
 	        //a num ea?eo iiia? aoeau a aeoaaeoa
-	     char c=1;
-	     System.out.println((int)text.charAt(i)+"/");
-	     if(text.charAt(i)>=1040&&text.charAt(i)<1123){
-		    System.out.println("sm+"+(int)smesh);	
-	    	 smesh = 'а';
-		    }
+	    char c;
+	    
+String texts = ""+text.charAt(i);
+	    
+	if( texts.matches("[а-яА-Я]")){
+		   
+	    	 
+	    	 int num = ((text.charAt(i) + keyWord.charAt(i % keyWord.length()) - 2 * rmesh) % 33);
+			  System.out.println(rmesh+"/"+num); 
+		    	
+	    	 c = (char)(rmesh-num);  
+	     System.out.print(c);
+	     ans.append(c);    
+	count++;
+	}
 		 else{
-			 smesh = 'a';	 
-		 }
-	     if(text.charAt(i)>=32&&text.charAt(i)<64){
-	    	c = text.charAt(i);
-	    }
-	    else{ 
-	    int num = ((text.charAt(i) + keyWord.charAt(i % keyWord.length()) - 2 * smesh) % 26);
-	   
-	    	
+			
+			 int num = ((text.charAt(i) + keyWord.charAt(i % keyWord.length()) - 2 * smesh) % 26);
+			   
+		    	
 	    	 c = (char)(num + smesh);
-	    }
+	    	 ans.append(c);
+	    	 count++;
+		 }
+	     if(text.charAt(i)<64){
+	    	c = text.charAt(i);
+	    	 ans.append(c);
+	   
+	    	// count++;
+	    	 }
+	  
 	     
-//	      char c = (char)(num + smesh);//iieo?aai io?iue neiaie
-	        ans.append(c);
+	       
 	    }
+	
+	  System.out.println("u "+ans.toString());
 	  String result = "";
 	 String a = "";
 	 char b; 
-	 for(int i = 0;i<ans.toString().length();i++){
+	System.out.println(text.length()+"/"+ans.toString().length()+"/"+letters.length()+"/"+count);
+	 for(int i = 0;i<count;i++){
 		if(letters.charAt(i)==49){
-		//System.out.println("ssss");
+		System.out.println("ssss");
 		a+=ans.toString().charAt(i);
 		a.toUpperCase();
 		b = a.charAt(0);
@@ -446,14 +563,14 @@ public String encrypt(String text, String keyWord)
 		a="";
 		
 		}   
-		else{
+	else{
 			result+=ans.toString().charAt(i);
 			
 			
 		}  
-	 }
-	System.out.println("res"+result);
-	System.out.println("decr"+decrypt(result,res));
+	}
+	System.out.println("result+  "+ans.toString());
+	System.out.println("decr "+decrypt(ans.toString(),res));
 	return result;
 
 }
@@ -584,7 +701,7 @@ public class writeToClient implements Runnable{
 		 		        						bw.write("\n"); // ieoai ia?aaia no?iee 
 		 		        						bw.flush(); // ioi?aaeyai 
 		                                         dlog.appendText("You:");
-		 		        						dlog.appendText(decrypt(us2,res));
+		 		        						dlog.appendText(encrypt(Usersline,res));
 		 		        						dlog.appendText("\n");
 		 		        						  mch = "";
 		 		        						 enter.setText("");
@@ -605,6 +722,7 @@ public class writeToClient implements Runnable{
 		        						//Usersline = UL.readLine(); 
 		        						Usersline  = enter.getText();
 		        						us2 = encrypt(Usersline,res); 
+		        						
 		        						//System.out.println(Usersline);
 		        						ulog.appendText("You:");
 		        						ulog.appendText(us2);
@@ -668,11 +786,13 @@ close(); //anee ae?e a iiiaio ioi?aaee - cae?uaaai aaiiue nieao.
 } 
 
 public String decrypt(String shifr, String keyWord)
-{ StringBuilder ans = new StringBuilder();
+{ 
+	int count = 0;
+	StringBuilder ans = new StringBuilder();
 String letters = "";
 for(int i = 0;i<shifr.length();i++){
    
-   if(shifr.charAt(i)<96){
+   if(((shifr.charAt(i)>=65&&shifr.charAt(i)<96)||(shifr.charAt(i)>1040&&shifr.charAt(i)<1072))){
 	   letters = letters+1;
 	    
    }
@@ -686,32 +806,41 @@ System.out.println("shifr LC "+shifr+"//"+letters);
 for(int i = 0; i < shifr.length();i++)
 {
 	 char c; 
-	 if(shifr.charAt(i)>=1040&&shifr.charAt(i)<1123){
-	    	smesh = 'а';
-	    }
+	 String texts = ""+shifr.charAt(i);
+	    
+		
+	 if( texts.matches("[а-я]")){
+	    	
+	    	int num = ((shifr.charAt(i)  - keyWord.charAt(i % keyWord.length()) + 33) % 33);
+	    	   
+	    	   System.out.println(num);
+	        c = (char)(rmesh+Math.abs(num));
+	 
+	        ans.append(c);
+	count++;
+	 }
 	 else{
-		 smesh = 'a';	 
+		 int num = ((shifr.charAt(i)  - keyWord.charAt(i % keyWord.length()) + 26) % 26);
+		   
+		   
+	     c = (char)(num + smesh);
+	     ans.append(c);
+	count++;
 	 }
 	 if(shifr.charAt(i)>=32&&shifr.charAt(i)<64){
 	    	c = shifr.charAt(i);
-	    }
-	    else{ 
-	int num = ((shifr.charAt(i)  - keyWord.charAt(i % keyWord.length()) + 26) % 26);
-    //ia?aoiua i?aia?aciaaiey n iiia?ii aoeau a aeoaaeoa
-   
-   
-   // System.out.print(shifr.charAt(i)+"/"+num+"//");
-   
-     c = (char)(num + smesh);
-	    }
-	
-    ans.append(c);
+	   
+	    	ans.append(c);
+	    	}
+	    
+    
    
 }
+System.out.println("noappend "+ans.toString());
 String result = "";
 String a = "";
 char b; 
-for(int j = 0;j<ans.toString().length();j++){
+for(int j = 0;j<count;j++){
 	if(letters.charAt(j)==49){
 	System.out.println("s");
 	a+=ans.toString().charAt(j);
@@ -727,7 +856,7 @@ for(int j = 0;j<ans.toString().length();j++){
 		
 	}  
 }
-System.out.println("res"+result);
+System.out.println("res"+ans.toString());
 return result;}
 
 
